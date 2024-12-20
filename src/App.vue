@@ -9,17 +9,13 @@ const value = ref(null)
 <template>
   <div class="flex-container">
     <div class="row">
-      <div style="overflow: hidden; max-width: 500px;">
-        {{ value }}
-      </div>
-      <InputText v-model="value" class="large-input" type="text" size="large" placeholder="Large" />
+      <InputText v-model="value" class="large-input" type="text" size="large" placeholder="Search for a product..." />
     </div>
-    <div class="row" style="margin-top: 20px">
+    <div class="row" style="margin-top: 20px; border: 1px solid lightgrey; border-radius: 10px">
       <Catalog />
     </div>
   </div>
 </template>
-
 
 <style scoped>
 /* Full-page container */
@@ -37,5 +33,4 @@ const value = ref(null)
   max-width: 500px; /* Optional: Set a max width */
   font-size: 1.5rem; /* Larger font size */
 }
-
 </style>
