@@ -3,11 +3,11 @@ from django.core.management.base import BaseCommand
 from api.models import Product  # Import your Product model
 
 class Command(BaseCommand):
-    help = "Create 1000 new products in the database"
+    help = "Create 1,000,000 new products in the database"
 
     def handle(self, *args, **kwargs):
         products = []
-        for i in range(1000):
+        for i in range(1000000):
             product_name = f"Product {i+1}"
             description = f"This is the description for {product_name}."
             price = round(random.uniform(10, 500), 2)  # Random price between 10 and 500

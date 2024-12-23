@@ -12,6 +12,5 @@ class ExampleView(APIView):
         return Response(data)
 
 class ProductViewSet(ModelViewSet):
-    print("HI")
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
