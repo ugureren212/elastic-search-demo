@@ -1,26 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue';
-import API from '@/services/api';
 import Catalog from '@/components/Catalog.vue'
 import InputText from 'primevue/inputtext'
 
 const value = ref(null)
 
-defineProps<{
-  product: Record<string, any>; // Define the expected structure of the product object as needed
-}>();
-
-const examples = ref([]);
-
-// Fetch examples data on component mount
-API.get('examples/')
-  .then(response => {
-    console.log("response.data", response.data)
-    examples.value = response.data;
-  })
-  .catch(error => {
-    console.error('Error fetching data:', error);
-  });
 </script>
 
 <template>
