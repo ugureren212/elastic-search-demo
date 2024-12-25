@@ -12,7 +12,6 @@ const randomColor = `#${Array.from({ length: 3 })
     return value.toString(16).padStart(2, '0'); // Convert to hex with padding
   })
   .join('')}`;
-
 </script>
 
 <template>
@@ -22,10 +21,10 @@ const randomColor = `#${Array.from({ length: 3 })
         <p>{{ product.name }}</p>
       </div>
     </template>
-    <template #title>{{ product.name }}</template>
     <template #content>
-      <p>Category: {{ product.category }}</p>
+      <p>{{ product.description }}</p>
       <p>Price: ${{ product.price }}</p>
+      <p>Stock: {{ product.stock }}</p>
     </template>
   </Card>
 </template>
