@@ -9,6 +9,10 @@ const searchQuery = ref('')
 const products = ref([])
 const loading = ref(false)
 
+function createProduct() {
+  console.log('HI')
+}
+
 async function handleDelete(id: number) {
   try {
     await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
@@ -40,9 +44,9 @@ const fetchProducts = async () => {
 }
 
 onMounted(() => {
-  searchQuery.value = initialSearch;
-  fetchProducts();
-});
+  searchQuery.value = initialSearch
+  fetchProducts()
+})
 
 watch(searchQuery, fetchProducts)
 </script>
@@ -51,13 +55,18 @@ watch(searchQuery, fetchProducts)
   <div class="flex-container">
     <!-- Search bar -->
     <div class="row">
-      <InputText
-        v-model="searchQuery"
-        class="large-input"
-        type="text"
-        size="large"
-        placeholder="Search for a product..."
-      />
+      <div class="column">
+        <InputText
+          v-model="searchQuery"
+          class="large-input"
+          type="text"
+          size="large"
+          placeholder="Search for a product..."
+        />
+      </div>
+      <div class="column">
+        <button id="create-product-btn" @click="createProduct">+</button>
+      </div>
     </div>
 
     <!-- Loading indicator -->
@@ -66,10 +75,7 @@ watch(searchQuery, fetchProducts)
     <!--    </div>-->
 
     <!-- Products catalog -->
-    <div
-      class="row"
-      style="margin-top: 20px; border: 1px solid lightgrey; border-radius: 10px"
-    >
+    <div class="row">
       <Catalog @delete-product="handleDelete" :products="products" />
     </div>
 
@@ -81,18 +87,50 @@ watch(searchQuery, fetchProducts)
 </template>
 
 <style scoped>
+.row {
+  display: flex; /* Flex container to arrange children in a row */
+  align-items: center; /* Vertically align items */
+  justify-content: space-between; /* Add space between columns */
+  gap: 10px; /* Space between columns */
+}
+
+.column {
+  flex: 1; /* Each column takes equal width */
+  max-width: 50%; /* Optional: Limit column width */
+}
+
+.large-input {
+  width: 100%;
+  max-width: 500px;
+  font-size: 1.5rem;
+}
+
+#create-product-btn {
+  background-color: #4CAF50; /* Green background */
+  border: 2px solid #ccc; /* Grey border */
+  color: white; /* White text */
+  font-size: 30px; /* Font size */
+  font-weight: bold; /* Bold text */
+  padding: 5px; /* Padding for spacing */
+  max-width: 100%; /* Button spans full width of its column */
+  border-radius: 5px; /* Rounded corners */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: all 0.3s ease; /* Smooth hover effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a cool effect */
+}
+
+#create-product-btn:hover {
+  background-color: #45a049; /* Slightly darker green on hover */
+  border-color: #aaa; /* Darker grey border on hover */
+  transform: scale(1.1); /* Slightly enlarge the button */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+}
+
 .flex-container {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100vh;
-}
-
-.large-input {
-  width: 100%;
-  min-width: 500px;
-  max-width: 500px;
-  font-size: 1.5rem;
 }
 </style>
