@@ -1,0 +1,13 @@
+cluster.name: "elasticsearch-cluster"
+node.name: "node-1"
+path.data: /usr/share/elasticsearch/data
+path.logs: /usr/share/elasticsearch/logs
+network.host: 0.0.0.0
+http.port: 9200
+xpack.security.enabled: false
+xpack.security.http.ssl.enabled: false
+http.cors.enabled: true
+http.cors.allow-origin: "http://localhost:5173"
+http.cors.allow-methods: "OPTIONS, HEAD, GET, POST, PUT, DELETE"
+http.cors.allow-headers: "X-Requested-With, Content-Type, Content-Length, Authorization"
+
