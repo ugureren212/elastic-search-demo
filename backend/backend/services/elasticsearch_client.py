@@ -6,7 +6,6 @@ from api.models import Product
 
 env_path = Path(__file__).resolve().parents[3] / "elastic-start-local/.env"
 
-
 load_dotenv(dotenv_path=env_path)
 
 es_local_password = os.getenv("ES_LOCAL_PASSWORD")

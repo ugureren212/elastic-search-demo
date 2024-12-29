@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import { defineProps} from 'vue';
+import { defineEmits, defineProps } from 'vue'
 import Product from './Product.vue';
+
+const emit = defineEmits(['delete-product']);
 
 defineProps({
   products: {
@@ -8,6 +10,10 @@ defineProps({
     required: true,
   },
 });
+
+function handleDelete(id: number){
+  emit('delete-product', id);
+}
 </script>
 
 <template>
@@ -17,7 +23,7 @@ defineProps({
       :key="index"
       class="grid-item"
     >
-      <Product :product="product" />
+      <Product @delete-product="handleDelete" :product="product" />
     </div>
   </div>
 </template>

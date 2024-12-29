@@ -9,6 +9,16 @@ const searchQuery = ref('')
 const products = ref([])
 const loading = ref(false)
 
+async function handleDelete(id: number) {
+  try {
+    await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
+    products.value = products.value.filter(product => product.id !== id)
+    console.log(`Product with ID ${id} deleted successfully from Elasticsearch.`)
+  } catch (error) {
+    console.error(`Error deleting product with ID ${id}:`, error)
+  }
+}
+
 const fetchProducts = async () => {
   if (!searchQuery.value) {
     products.value = []
@@ -60,7 +70,7 @@ watch(searchQuery, fetchProducts)
       class="row"
       style="margin-top: 20px; border: 1px solid lightgrey; border-radius: 10px"
     >
-      <Catalog :products="products" />
+      <Catalog @delete-product="handleDelete" :products="products" />
     </div>
 
     <!-- No results message -->
