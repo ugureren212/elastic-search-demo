@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import Catalog from '@/components/Catalog.vue'
 import InputText from 'primevue/inputtext'
 import axios from 'axios'
 
+const initialSearch = "Product";
 const searchQuery = ref('')
 const products = ref([])
 const loading = ref(false)
@@ -28,6 +29,10 @@ const fetchProducts = async () => {
   }
 }
 
+onMounted(() => {
+  searchQuery.value = initialSearch;
+  fetchProducts();
+});
 
 watch(searchQuery, fetchProducts)
 </script>
