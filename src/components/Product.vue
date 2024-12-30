@@ -30,9 +30,9 @@ function handleDelete(id: number){
       </div>
     </template>
     <template #content>
-      <p>{{ product.description }}</p>
       <p>Price: ${{ product.price }}</p>
       <p>Stock: {{ product.stock }}</p>
+      <p>{{ product.description }}</p>
     </template>
   </Card>
 </template>
