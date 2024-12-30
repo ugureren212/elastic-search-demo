@@ -3,6 +3,7 @@ import { defineEmits, onMounted, ref, watch } from 'vue'
 import Catalog from '@/components/Catalog.vue'
 import InputText from 'primevue/inputtext'
 import axios from 'axios'
+import FilteringSideBar from '@/components/FilteringSideBar.vue'
 
 const initialSearch = "Product";
 const searchQuery = ref('')
@@ -57,6 +58,7 @@ watch(searchQuery, fetchProducts)
 
 <template>
   <div class="flex-container">
+    <FilteringSideBar/>
     <!-- Search bar -->
     <div class="row">
       <div class="column">
