@@ -2,7 +2,7 @@
 import { defineEmits, defineProps } from 'vue'
 import Product from './Product.vue';
 
-const emit = defineEmits(['delete-product']);
+const emit = defineEmits(['handle-delete']);
 
 defineProps({
   products: {
@@ -12,7 +12,7 @@ defineProps({
 });
 
 function handleDelete(id: number){
-  emit('delete-product', id);
+  emit('handle-delete', id);
 }
 </script>
 

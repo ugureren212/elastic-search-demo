@@ -17,7 +17,7 @@ const randomColor = `#${Array.from({ length: 3 })
   .join('')}`;
 
 function handleDelete(id: number){
-  emit('delete-product', id);
+  emit('handle-delete', id);
 }
 </script>
 
