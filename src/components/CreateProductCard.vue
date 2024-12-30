@@ -1,21 +1,31 @@
-<script setup lang="ts">
-import { defineEmits, ref } from 'vue'
+<<script setup lang="ts">
+import { defineEmits, defineProps, ref, onMounted } from 'vue'
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
 import axios from 'axios'
 
 const cardName = ref('')
-const cardPrice = ref(null)
-const cardStock = ref(null)
+const cardPrice = ref<number | null>(null)
+const cardStock = ref<number | null>(null)
 const cardDescription = ref('')
-const emit = defineEmits(['handle-create-product'])
+const emit = defineEmits(['handle-remove-product','handle-create-product', 'handle-edit-product'])
+
+const { editProduct } = defineProps<{
+  editProduct?: {
+    name: string
+    price: number
+    stock: number
+    description: string
+  }
+}>()
 
 function handleCloseCreateProductOverlay() {
   cardName.value = ''
   cardPrice.value = null
   cardStock.value = null
   cardDescription.value = ''
+  emit("handle-remove-product")
   emit('handle-create-product', false)
 }
 
@@ -45,7 +55,17 @@ const handleSubmit = async () => {
     alert('Failed to add product. Please try again.')
   }
 }
+
+onMounted(() => {
+  if (editProduct) {
+    cardName.value = editProduct.name
+    cardPrice.value = editProduct.price
+    cardStock.value = editProduct.stock
+    cardDescription.value = editProduct.description
+  }
+})
 </script>
+
 
 <template>
   <Card class="product-card">

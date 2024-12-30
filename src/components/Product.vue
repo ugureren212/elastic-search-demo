@@ -2,7 +2,7 @@
 import Card from 'primevue/card';
 import { defineProps, defineEmits } from 'vue';
 
-const emit = defineEmits(['delete-item']);
+const emit = defineEmits(['handle-delete-product','handle-edit-product']);
 
 defineProps({
   product: Object,
@@ -16,8 +16,12 @@ const randomColor = `#${Array.from({ length: 3 })
   })
   .join('')}`;
 
-function handleDelete(id: number){
-  emit('handle-delete', id);
+function handleDeleteProduct(id: number){
+  emit('handle-delete-product', id);
+}
+
+function handleEditProduct(product: any){
+  emit('handle-edit-product', product);
 }
 </script>
 
@@ -26,7 +30,8 @@ function handleDelete(id: number){
     <template #header>
       <div class="header" :style="{ backgroundColor: randomColor }">
         <p>{{ product.name }}</p>
-        <div class="deleteProductButton" @click="handleDelete(product.id)">x</div>
+        <div class="deleteProductButton" @click="handleDeleteProduct(product.id)">x</div>
+        <div class="createProductButton" @click="handleEditProduct(product)">✏️</div>
       </div>
     </template>
     <template #content>
@@ -71,6 +76,28 @@ function handleDelete(id: number){
 }
 
 .deleteProductButton:hover {
+  transform: scale(1.1);
+}
+
+.createProductButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid black;
+  border-radius: 5px;
+  background: darkblue;
+  color: white;
+  font-weight: bold;
+  font-size: 14px; /* Adjust font size to fit the smaller button */
+  width: 20px; /* Fixed square dimensions */
+  height: 20px;
+  line-height: 0; /* Remove line-height to prevent vertical misalignment */
+  cursor: pointer;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.createProductButton:hover {
   transform: scale(1.1);
 }
 

@@ -2,7 +2,7 @@
 import { defineEmits, defineProps } from 'vue'
 import Product from './Product.vue';
 
-const emit = defineEmits(['handle-delete']);
+const emit = defineEmits(['handle-delete-product','handle-edit-product']);
 
 defineProps({
   products: {
@@ -11,8 +11,11 @@ defineProps({
   },
 });
 
-function handleDelete(id: number){
-  emit('handle-delete', id);
+function handleDeleteProduct(id: number){
+  emit('handle-delete-product', id);
+}
+function handleEditProduct(product: any){
+  emit('handle-edit-product', product);
 }
 </script>
 
@@ -23,7 +26,7 @@ function handleDelete(id: number){
       :key="index"
       class="grid-item"
     >
-      <Product @delete-product="handleDelete" :product="product" />
+      <Product @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct" :product="product" />
     </div>
   </div>
 </template>

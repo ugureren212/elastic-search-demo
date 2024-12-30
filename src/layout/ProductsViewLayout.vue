@@ -9,12 +9,15 @@ const searchQuery = ref('')
 const products = ref([])
 const loading = ref(false)
 
-const emit = defineEmits(['handle-create-product']);
+const emit = defineEmits(['handle-create-product', 'handle-edit-product']);
 function handleCreateProduct(){
   emit('handle-create-product', true);
 }
+function handleEditProduct(product: any){
+  emit('handle-edit-product', true, product);
+}
 
-async function handleDelete(id: number) {
+async function handleDeleteProduct(id: number) {
   try {
     await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
     products.value = products.value.filter(product => product.id !== id)
@@ -77,7 +80,7 @@ watch(searchQuery, fetchProducts)
 
     <!-- Products catalog -->
     <div class="row">
-      <Catalog @delete-product="handleDelete" :products="products" />
+      <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct" :products="products" />
     </div>
 
     <!-- No results message -->
