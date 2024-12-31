@@ -1,15 +1,28 @@
-<<script setup lang="ts">
+<script setup lang="ts">
 import { defineEmits, defineProps, ref, onMounted } from 'vue'
 import Card from 'primevue/card'
 import InputText from 'primevue/inputtext'
 import Button from 'primevue/button'
+import Dropdown from 'primevue/dropdown'
 import axios from 'axios'
 
 const cardName = ref('')
 const cardPrice = ref<number | null>(null)
 const cardStock = ref<number | null>(null)
 const cardDescription = ref('')
-const emit = defineEmits(['handle-remove-product','handle-create-product', 'handle-edit-product'])
+const cardCategory = ref(null)
+const cardBrand = ref(null)
+const cardColor = ref(null)
+const cardRating = ref<number | null>(null)
+const cardAvailability = ref<boolean | null>(null)
+
+const categories = ["Electronics", "Fashion", "Home", "Books", "Sports", "Toys"]
+const brands = ["BrandA", "BrandB", "BrandC", "BrandD", "BrandE"]
+const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"]
+const ratings = [1, 2, 3, 4, 5]
+const availabilityOptions = [true, false]
+
+const emit = defineEmits(['handle-remove-product', 'handle-create-product', 'handle-edit-product'])
 
 const { editProduct } = defineProps<{
   editProduct?: {
@@ -17,6 +30,11 @@ const { editProduct } = defineProps<{
     price: number
     stock: number
     description: string
+    category: string
+    brand: string
+    color: string
+    rating: number
+    is_available: boolean
   }
 }>()
 
@@ -25,31 +43,49 @@ function handleCloseCreateProductOverlay() {
   cardPrice.value = null
   cardStock.value = null
   cardDescription.value = ''
+  cardCategory.value = null
+  cardBrand.value = null
+  cardColor.value = null
+  cardRating.value = null
+  cardAvailability.value = null
   emit("handle-remove-product")
   emit('handle-create-product', false)
 }
 
 const handleSubmit = async () => {
-  if (!cardName.value || !cardPrice.value || !cardStock.value || !cardDescription.value) {
+  if (
+    !cardName.value ||
+    !cardPrice.value ||
+    !cardStock.value ||
+    !cardDescription.value ||
+    !cardCategory.value ||
+    !cardBrand.value ||
+    !cardColor.value ||
+    cardRating.value === null ||
+    cardAvailability.value === null
+  ) {
     alert('Please fill out all fields')
     return
   }
+
   emit('handle-create-product', false)
 
   const newProduct = {
     name: cardName.value,
     price: cardPrice.value,
     stock: cardStock.value,
-    description: cardDescription.value
+    description: cardDescription.value,
+    category: cardCategory.value,
+    brand: cardBrand.value,
+    color: cardColor.value,
+    rating: cardRating.value,
+    is_available: cardAvailability.value,
   }
 
   try {
     await axios.post('http://127.0.0.1:9200/products/_doc', newProduct)
     alert('Product successfully added!')
-    cardName.value = ''
-    cardPrice.value = null
-    cardStock.value = null
-    cardDescription.value = ''
+    handleCloseCreateProductOverlay()
   } catch (error) {
     console.error('Error adding product:', error)
     alert('Failed to add product. Please try again.')
@@ -62,10 +98,14 @@ onMounted(() => {
     cardPrice.value = editProduct.price
     cardStock.value = editProduct.stock
     cardDescription.value = editProduct.description
+    cardCategory.value = editProduct.category
+    cardBrand.value = editProduct.brand
+    cardColor.value = editProduct.color
+    cardRating.value = editProduct.rating
+    cardAvailability.value = editProduct.is_available
   }
 })
 </script>
-
 
 <template>
   <Card class="product-card">
@@ -91,6 +131,26 @@ onMounted(() => {
           <p class="label">Description</p>
           <InputText type="text" v-model="cardDescription" />
         </div>
+        <div class="flex-row">
+          <p class="label">Category</p>
+          <Dropdown :options="categories" v-model="cardCategory" placeholder="Select a category" />
+        </div>
+        <div class="flex-row">
+          <p class="label">Brand</p>
+          <Dropdown :options="brands" v-model="cardBrand" placeholder="Select a brand" />
+        </div>
+        <div class="flex-row">
+          <p class="label">Color</p>
+          <Dropdown :options="colors" v-model="cardColor" placeholder="Select a color" />
+        </div>
+        <div class="flex-row">
+          <p class="label">Rating</p>
+          <Dropdown :options="ratings" v-model="cardRating" placeholder="Select a rating" />
+        </div>
+        <div class="flex-row">
+          <p class="label">Availability</p>
+          <Dropdown :options="availabilityOptions" v-model="cardAvailability" placeholder="Select availability" />
+        </div>
       </div>
       <div style="display: flex; gap: 10px; justify-content: flex-end;">
         <Button label="Submit" @click="handleSubmit" />
@@ -102,6 +162,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
+/* Updated styles for 100% width input fields */
 .product-card {
   width: 30rem;
   height: auto;
@@ -147,8 +208,11 @@ onMounted(() => {
   color: #333;
 }
 
-input {
+input,
+.p-dropdown,
+.p-checkbox {
   flex: 2;
+  width: 100%; /* Set input field width to 100% */
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -156,7 +220,8 @@ input {
   transition: border-color 0.2s;
 }
 
-input:focus {
+input:focus,
+.p-dropdown:focus {
   border-color: #4caf50;
   outline: none;
 }

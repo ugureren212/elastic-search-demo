@@ -37,9 +37,13 @@ function handleEditProduct(product: any) {
     </template>
     <template #content>
       <div class="product-details">
-        <p><strong>ID:</strong> {{ product.id }}</p>
         <p><strong>Price:</strong> ${{ product.price }}</p>
         <p><strong>Stock:</strong> {{ product.stock }}</p>
+        <p><strong>Category:</strong> {{ product.category }}</p>
+        <p><strong>Brand:</strong> {{ product.brand }}</p>
+        <p><strong>Color:</strong> {{ product.color }}</p>
+        <p><strong>Rating:</strong> {{ product.rating }} / 5</p>
+        <p><strong>Availability:</strong> <span :class="product.is_available ? 'available' : 'unavailable'">{{ product.is_available ? 'In Stock' : 'Out of Stock' }}</span></p>
         <p><strong>Description:</strong> {{ product.description }}</p>
       </div>
     </template>
@@ -49,19 +53,19 @@ function handleEditProduct(product: any) {
 <style scoped>
 /* Card styling */
 .product-card {
-  width: 15rem;
+  width: 18rem;
   margin: auto;
   border: 1px solid #e0e0e0;
-  border-radius: 10px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  background: #fdfdfd;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .product-card:hover {
-  transform: scale(1.02);
-  box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 /* Header styling */
@@ -69,11 +73,11 @@ function handleEditProduct(product: any) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 15px;
+  padding: 12px 16px;
   color: #fff;
   font-size: 1.25rem;
   font-weight: bold;
-  border-radius: 10px 10px 0 0;
+  border-radius: 12px 12px 0 0;
 }
 
 .product-name {
@@ -83,62 +87,73 @@ function handleEditProduct(product: any) {
 /* Action buttons styling */
 .action-buttons {
   display: flex;
-  gap: 5px;
+  gap: 8px;
 }
 
 .deleteProductButton {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
-  border-radius: 5px;
-  background: darkred;
+  border: none;
+  border-radius: 50%;
+  background: #ff4d4d;
   color: white;
-  font-weight: bold;
-  font-size: 12px;
-  width: 24px;
-  height: 24px;
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .deleteProductButton:hover {
-  transform: scale(1.2);
+  background: #ff1a1a;
+  transform: scale(1.1);
 }
 
 .createProductButton {
   display: flex;
   justify-content: center;
   align-items: center;
-  border: 1px solid black;
-  border-radius: 5px;
-  background: darkblue;
+  border: none;
+  border-radius: 50%;
+  background: #4caf50;
   color: white;
-  font-weight: bold;
-  font-size: 12px;
-  width: 24px;
-  height: 24px;
+  font-size: 14px;
+  width: 28px;
+  height: 28px;
   cursor: pointer;
-  transition: transform 0.2s ease;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .createProductButton:hover {
-  transform: scale(1.2);
+  background: #388e3c;
+  transform: scale(1.1);
 }
 
 /* Content styling */
 .product-details {
-  padding: 10px 15px;
+  padding: 16px;
   color: #333;
   font-size: 0.95rem;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .product-details p {
-  margin: 5px 0;
+  margin: 6px 0;
 }
 
 .product-details strong {
   color: #555;
+}
+
+/* Availability styling */
+.available {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.unavailable {
+  color: #f44336;
+  font-weight: bold;
 }
 </style>

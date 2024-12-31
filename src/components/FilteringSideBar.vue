@@ -11,6 +11,7 @@
     <!-- Sidebar Component -->
     <Sidebar v-model:visible="visible" position="right">
       <h3>Filter Products</h3>
+      <!-- Category Filter -->
       <div class="filter-section">
         <h4>Category</h4>
         <Dropdown
@@ -19,15 +20,58 @@
           placeholder="Select a Category"
         />
       </div>
+
+      <!-- Brand Filter -->
+      <div class="filter-section">
+        <h4>Brand</h4>
+        <Dropdown
+          v-model="selectedBrand"
+          :options="brands"
+          placeholder="Select a Brand"
+        />
+      </div>
+
+      <!-- Color Filter -->
+      <div class="filter-section">
+        <h4>Color</h4>
+        <Dropdown
+          v-model="selectedColor"
+          :options="colors"
+          placeholder="Select a Color"
+        />
+      </div>
+
+      <!-- Price Range Filter -->
       <div class="filter-section">
         <h4 style="margin-bottom: 10px">Price Range</h4>
-        <Slider style="margin-bottom: 10px" v-model="priceRange" :min="0" :max="500" :step="10" />
+        <Slider
+          style="margin-bottom: 10px"
+          v-model="priceRange"
+          :min="0"
+          :max="500"
+          :step="10"
+          range
+        />
         <p>€{{ priceRange[0] }} - €{{ priceRange[1] }}</p>
       </div>
+
+      <!-- Rating Filter -->
       <div class="filter-section">
-        <h4>In Stock</h4>
+        <h4>Rating</h4>
+        <Dropdown
+          v-model="selectedRating"
+          :options="ratings"
+          placeholder="Select a Rating"
+        />
+      </div>
+
+      <!-- Availability Filter -->
+      <div class="filter-section">
+        <h4>Availability</h4>
         <Checkbox v-model="inStock" /> <label>Only show products in stock</label>
       </div>
+
+      <!-- Action Buttons -->
       <div class="filter-actions">
         <Button label="Apply Filters" icon="pi pi-check" class="p-button-success" />
         <Button label="Reset" icon="pi pi-times" class="p-button-secondary" @click="resetFilters" />
@@ -37,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import Sidebar from 'primevue/sidebar';
 import Dropdown from 'primevue/dropdown';
 import Slider from 'primevue/slider';
@@ -45,20 +89,65 @@ import Checkbox from 'primevue/checkbox';
 import Button from 'primevue/button';
 
 const visible = ref(false);
+
 const categories = ref([
   { label: 'Electronics', value: 'electronics' },
   { label: 'Books', value: 'books' },
   { label: 'Clothing', value: 'clothing' },
 ]);
+
+const brands = ref([
+  { label: 'BrandA', value: 'brandA' },
+  { label: 'BrandB', value: 'brandB' },
+  { label: 'BrandC', value: 'brandC' },
+]);
+
+const colors = ref([
+  { label: 'Red', value: 'red' },
+  { label: 'Blue', value: 'blue' },
+  { label: 'Green', value: 'green' },
+]);
+
+const ratings = ref([
+  { label: '1 Star', value: 1 },
+  { label: '2 Stars', value: 2 },
+  { label: '3 Stars', value: 3 },
+  { label: '4 Stars', value: 4 },
+  { label: '5 Stars', value: 5 },
+]);
+
 const selectedCategory = ref(null);
+const selectedBrand = ref(null);
+const selectedColor = ref(null);
+const selectedRating = ref(null);
 const priceRange = ref([0, 500]);
 const inStock = ref(false);
 
+const emit = defineEmits(['update-filters']);
+
 function resetFilters() {
   selectedCategory.value = null;
+  selectedBrand.value = null;
+  selectedColor.value = null;
+  selectedRating.value = null;
   priceRange.value = [0, 500];
   inStock.value = false;
 }
+
+watch(
+  [selectedCategory, selectedBrand, selectedColor, selectedRating, priceRange, inStock],
+  ([newCategory, newBrand, newColor, newRating, newPriceRange, newStock]) => {
+    emit('update-filters', {
+      selectedCategory: newCategory,
+      selectedBrand: newBrand,
+      selectedColor: newColor,
+      selectedRating: newRating,
+      priceRange: newPriceRange,
+      inStock: newStock,
+    });
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
