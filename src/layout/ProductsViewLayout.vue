@@ -10,7 +10,21 @@ const searchQuery = ref('')
 const products = ref([])
 const loading = ref(false)
 
+const appliedFilters = ref({
+  selectedCategory: null,
+  selectedBrand: null,
+  selectedColor: null,
+  selectedRating: null,
+  priceRange: [0, 500],
+  inStock: false,
+});
+
 const emit = defineEmits(['handle-create-product', 'handle-edit-product']);
+
+function handleFiltersUpdate(filters: any){
+  appliedFilters.value = filters;
+  console.log('Updated Filters:', filters);
+}
 function handleCreateProduct(){
   emit('handle-create-product', true);
 }
@@ -58,7 +72,7 @@ watch(searchQuery, fetchProducts)
 
 <template>
   <div class="flex-container">
-    <FilteringSideBar/>
+    <FilteringSideBar @update-filters="handleFiltersUpdate"/>
     <!-- Search bar -->
     <div class="row">
       <div class="column">
