@@ -21,10 +21,68 @@ const appliedFilters = ref({
 
 const emit = defineEmits(['handle-create-product', 'handle-edit-product']);
 
-function handleFiltersUpdate(filters: any){
+async function handleFiltersUpdate(filters: any) {
   appliedFilters.value = filters;
-  console.log('Updated Filters:', filters);
+
+  // Build Elasticsearch query
+  const mustQueries = [];
+
+  if (filters.selectedCategory) {
+    mustQueries.push({ match: { category: filters.selectedCategory } });
+  }
+  if (filters.selectedBrand) {
+    mustQueries.push({ match: { brand: filters.selectedBrand } });
+  }
+  if (filters.selectedColor) {
+    mustQueries.push({ match: { color: filters.selectedColor } });
+  }
+  if (filters.selectedRating) {
+    mustQueries.push({ match: { rating: filters.selectedRating } });
+  }
+  if (filters.inStock) {
+    mustQueries.push({ match: { is_available: true } });
+  }
+  // Price range filter
+  if (filters.priceRange && filters.priceRange.length === 2) {
+    mustQueries.push({
+      range: {
+        price: {
+          gte: filters.priceRange[0],
+          lte: filters.priceRange[1],
+        },
+      },
+    });
+  }
+
+  // Elasticsearch query body
+  const esQuery = {
+    query: {
+      bool: {
+        must: mustQueries,
+      },
+    },
+  };
+
+  try {
+    // Make a request to Elasticsearch
+    const response = await axios.post(
+      'http://127.0.0.1:9200/products/_search',
+      esQuery
+    );
+
+    // Extract and update products
+    const hits = response.data.hits.hits;
+    products.value = hits.map((hit: any) => ({
+      id: hit._id,
+      ...hit._source,
+    }));
+
+    console.log('Filtered Products:', products.value);
+  } catch (error) {
+    console.error('Error fetching filtered products:', error);
+  }
 }
+
 function handleCreateProduct(){
   emit('handle-create-product', true);
 }
