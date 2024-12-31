@@ -2,9 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
-from backend.services.elasticsearch_client import es
 from .models import Product
 from .serializers import ProductSerializer
+from api.utils.elasticsearch_client import es
 
 class SearchProductsView(APIView):
 
