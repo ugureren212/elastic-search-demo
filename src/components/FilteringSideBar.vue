@@ -68,7 +68,8 @@
       <!-- Availability Filter -->
       <div class="filter-section">
         <h4>Availability</h4>
-        <Checkbox v-model="inStock" /> <label>Only show products in stock</label>
+        <Checkbox v-model="inStock" />
+        <label>Only show products in stock</label>
       </div>
 
       <!-- Action Buttons -->
@@ -81,57 +82,59 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import Sidebar from 'primevue/sidebar';
-import Dropdown from 'primevue/dropdown';
-import Slider from 'primevue/slider';
-import Checkbox from 'primevue/checkbox';
-import Button from 'primevue/button';
+import { ref, watch } from 'vue'
+import Sidebar from 'primevue/sidebar'
+import Dropdown from 'primevue/dropdown'
+import Slider from 'primevue/slider'
+import Checkbox from 'primevue/checkbox'
+import Button from 'primevue/button'
 
-const visible = ref(false);
+const visible = ref(false)
 
 const categories = ref([
-  { label: 'Electronics', value: 'electronics' },
-  { label: 'Books', value: 'books' },
-  { label: 'Clothing', value: 'clothing' },
-]);
+  'Electronics',
+  'Fashion',
+  'Home',
+  'Books',
+  'Sports',
+  'Toys'
+])
 
 const brands = ref([
-  { label: 'BrandA', value: 'brandA' },
-  { label: 'BrandB', value: 'brandB' },
-  { label: 'BrandC', value: 'brandC' },
-]);
+  'BrandA',
+  'BrandB',
+  'BrandC',
+  'BrandD',
+  'BrandE'
+])
 
 const colors = ref([
-  { label: 'Red', value: 'red' },
-  { label: 'Blue', value: 'blue' },
-  { label: 'Green', value: 'green' },
-]);
+  'Red',
+  'Blue',
+  'Green',
+  'Black',
+  'White',
+  'Yellow'
+])
 
-const ratings = ref([
-  { label: '1 Star', value: 1 },
-  { label: '2 Stars', value: 2 },
-  { label: '3 Stars', value: 3 },
-  { label: '4 Stars', value: 4 },
-  { label: '5 Stars', value: 5 },
-]);
+const ratings = ref([1, 2, 3, 4, 5])
 
-const selectedCategory = ref(null);
-const selectedBrand = ref(null);
-const selectedColor = ref(null);
-const selectedRating = ref(null);
-const priceRange = ref([0, 500]);
-const inStock = ref(false);
+const selectedCategory = ref(null)
+const selectedBrand = ref(null)
+const selectedColor = ref(null)
+const selectedRating = ref(null)
+const priceRange = ref([0, 500])
+const inStock = ref(false)
 
-const emit = defineEmits(['update-filters']);
+const emit = defineEmits(['update-filters'])
 
 function resetFilters() {
-  selectedCategory.value = null;
-  selectedBrand.value = null;
-  selectedColor.value = null;
-  selectedRating.value = null;
-  priceRange.value = [0, 500];
-  inStock.value = false;
+  selectedCategory.value = null
+  selectedBrand.value = null
+  selectedColor.value = null
+  selectedRating.value = null
+  priceRange.value = [0, 500]
+  inStock.value = false
 }
 
 watch(
@@ -143,11 +146,11 @@ watch(
       selectedColor: newColor,
       selectedRating: newRating,
       priceRange: newPriceRange,
-      inStock: newStock,
-    });
+      inStock: newStock
+    })
   },
   { deep: true }
-);
+)
 </script>
 
 <style scoped>
@@ -161,6 +164,7 @@ watch(
   font-weight: bold;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 .toggle-button:hover {
   transform: scale(1.1);
   transition: transform 0.2s;
