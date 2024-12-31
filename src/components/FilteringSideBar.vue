@@ -14,30 +14,39 @@
       <!-- Category Filter -->
       <div class="filter-section">
         <h4>Category</h4>
-        <Dropdown
+        <MultiSelect
+          display="chip"
+          :maxSelectedLabels="3"
           v-model="selectedCategory"
           :options="categories"
-          placeholder="Select a Category"
+          optionLabel="label"
+          placeholder="Select Categories"
         />
       </div>
 
       <!-- Brand Filter -->
       <div class="filter-section">
         <h4>Brand</h4>
-        <Dropdown
+        <MultiSelect
+          display="chip"
+          :maxSelectedLabels="3"
           v-model="selectedBrand"
           :options="brands"
-          placeholder="Select a Brand"
+          optionLabel="label"
+          placeholder="Select Brands"
         />
       </div>
 
       <!-- Color Filter -->
       <div class="filter-section">
         <h4>Color</h4>
-        <Dropdown
+        <MultiSelect
+          display="chip"
+          :maxSelectedLabels="3"
           v-model="selectedColor"
           :options="colors"
-          placeholder="Select a Color"
+          optionLabel="label"
+          placeholder="Select Colors"
         />
       </div>
 
@@ -58,18 +67,21 @@
       <!-- Rating Filter -->
       <div class="filter-section">
         <h4>Rating</h4>
-        <Dropdown
+        <MultiSelect
+          display="chip"
+          :maxSelectedLabels="3"
           v-model="selectedRating"
           :options="ratings"
-          placeholder="Select a Rating"
+          optionLabel="label"
+          placeholder="Select Ratings"
         />
       </div>
 
       <!-- Availability Filter -->
       <div class="filter-section">
         <h4>Availability</h4>
-        <Checkbox v-model="inStock" />
-        <label>Only show products in stock</label>
+        <Checkbox v-model="inStock" binary />
+        <label>{{ inStock ? "Only In Stock" : "  All Products" }}</label>
       </div>
 
       <!-- Action Buttons -->
@@ -84,7 +96,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import Sidebar from 'primevue/sidebar'
-import Dropdown from 'primevue/dropdown'
+import MultiSelect from 'primevue/multiselect'
 import Slider from 'primevue/slider'
 import Checkbox from 'primevue/checkbox'
 import Button from 'primevue/button'
@@ -92,47 +104,53 @@ import Button from 'primevue/button'
 const visible = ref(false)
 
 const categories = ref([
-  'Electronics',
-  'Fashion',
-  'Home',
-  'Books',
-  'Sports',
-  'Toys'
+  { label: 'Electronics', value: 'Electronics' },
+  { label: 'Fashion', value: 'Fashion' },
+  { label: 'Home', value: 'Home' },
+  { label: 'Books', value: 'Books' },
+  { label: 'Sports', value: 'Sports' },
+  { label: 'Toys', value: 'Toys' }
 ])
 
 const brands = ref([
-  'BrandA',
-  'BrandB',
-  'BrandC',
-  'BrandD',
-  'BrandE'
+  { label: 'BrandA', value: 'BrandA' },
+  { label: 'BrandB', value: 'BrandB' },
+  { label: 'BrandC', value: 'BrandC' },
+  { label: 'BrandD', value: 'BrandD' },
+  { label: 'BrandE', value: 'BrandE' }
 ])
 
 const colors = ref([
-  'Red',
-  'Blue',
-  'Green',
-  'Black',
-  'White',
-  'Yellow'
+  { label: 'Red', value: 'Red' },
+  { label: 'Blue', value: 'Blue' },
+  { label: 'Green', value: 'Green' },
+  { label: 'Black', value: 'Black' },
+  { label: 'White', value: 'White' },
+  { label: 'Yellow', value: 'Yellow' }
 ])
 
-const ratings = ref([1, 2, 3, 4, 5])
+const ratings = ref([
+  { label: '1 Star', value: 1 },
+  { label: '2 Stars', value: 2 },
+  { label: '3 Stars', value: 3 },
+  { label: '4 Stars', value: 4 },
+  { label: '5 Stars', value: 5 }
+])
 
-const selectedCategory = ref(null)
-const selectedBrand = ref(null)
-const selectedColor = ref(null)
-const selectedRating = ref(null)
+const selectedCategory = ref([])
+const selectedBrand = ref([])
+const selectedColor = ref([])
+const selectedRating = ref([])
 const priceRange = ref([0, 500])
 const inStock = ref(false)
 
 const emit = defineEmits(['update-filters'])
 
 function resetFilters() {
-  selectedCategory.value = null
-  selectedBrand.value = null
-  selectedColor.value = null
-  selectedRating.value = null
+  selectedCategory.value = []
+  selectedBrand.value = []
+  selectedColor.value = []
+  selectedRating.value = []
   priceRange.value = [0, 500]
   inStock.value = false
 }
@@ -178,5 +196,9 @@ watch(
   display: flex;
   justify-content: space-between;
   gap: 10px;
+}
+
+p-multiselect-header{
+  display: none;
 }
 </style>

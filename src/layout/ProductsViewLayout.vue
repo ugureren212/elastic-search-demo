@@ -5,7 +5,7 @@ import InputText from 'primevue/inputtext'
 import axios from 'axios'
 import FilteringSideBar from '@/components/FilteringSideBar.vue'
 
-const initialSearch = "Product";
+const initialSearch = 'Product'
 const searchQuery = ref('')
 const products = ref([])
 const loading = ref(false)
@@ -16,78 +16,95 @@ const appliedFilters = ref({
   selectedColor: null,
   selectedRating: null,
   priceRange: [0, 500],
-  inStock: false,
-});
+  inStock: false
+})
 
-const emit = defineEmits(['handle-create-product', 'handle-edit-product']);
+const emit = defineEmits(['handle-create-product', 'handle-edit-product'])
 
 async function handleFiltersUpdate(filters: any) {
-  appliedFilters.value = filters;
+  appliedFilters.value = filters
 
-  // Build Elasticsearch query
-  const mustQueries = [];
+  const mustQueries: any[] = []
 
-  if (filters.selectedCategory) {
-    mustQueries.push({ match: { category: filters.selectedCategory } });
+  // Handle multi-select fields
+  if (filters.selectedCategory && filters.selectedCategory.length > 0) {
+    const categories = filters.selectedCategory.map((c: any) => c.value || c)
+    mustQueries.push({
+      terms: { category: categories }
+    })
   }
-  if (filters.selectedBrand) {
-    mustQueries.push({ match: { brand: filters.selectedBrand } });
+
+  if (filters.selectedBrand && filters.selectedBrand.length > 0) {
+    const brands = filters.selectedBrand.map((b: any) => b.value || b)
+    mustQueries.push({
+      terms: { brand: brands }
+    })
   }
-  if (filters.selectedColor) {
-    mustQueries.push({ match: { color: filters.selectedColor } });
+
+  if (filters.selectedColor && filters.selectedColor.length > 0) {
+    const colors = filters.selectedColor.map((c: any) => c.value || c)
+    mustQueries.push({
+      terms: { color: colors }
+    })
   }
-  if (filters.selectedRating) {
-    mustQueries.push({ match: { rating: filters.selectedRating } });
+
+  if (filters.selectedRating && filters.selectedRating.length > 0) {
+    mustQueries.push({
+      terms: { rating: filters.selectedRating }
+    })
   }
-  if (filters.inStock) {
-    mustQueries.push({ match: { is_available: true } });
+
+  // Availability filter
+  if (filters.inStock !== null && filters.inStock !== undefined) {
+    mustQueries.push({
+      match: { is_available: filters.inStock }
+    })
   }
+
   // Price range filter
   if (filters.priceRange && filters.priceRange.length === 2) {
     mustQueries.push({
       range: {
         price: {
           gte: filters.priceRange[0],
-          lte: filters.priceRange[1],
-        },
-      },
-    });
+          lte: filters.priceRange[1]
+        }
+      }
+    })
   }
 
-  // Elasticsearch query body
   const esQuery = {
     query: {
       bool: {
-        must: mustQueries,
-      },
-    },
-  };
+        must: mustQueries
+      }
+    }
+  }
 
   try {
-    // Make a request to Elasticsearch
     const response = await axios.post(
       'http://127.0.0.1:9200/products/_search',
       esQuery
-    );
+    )
 
-    // Extract and update products
-    const hits = response.data.hits.hits;
+    const hits = response.data.hits.hits
     products.value = hits.map((hit: any) => ({
       id: hit._id,
-      ...hit._source,
-    }));
+      ...hit._source
+    }))
 
-    console.log('Filtered Products:', products.value);
+    console.log('Filtered Products:', products.value)
   } catch (error) {
-    console.error('Error fetching filtered products:', error);
+    console.error('Error fetching filtered products:', error.response?.data || error.message)
   }
 }
 
-function handleCreateProduct(){
-  emit('handle-create-product', true);
+function handleCreateProduct() {
+  emit('handle-create-product', true)
 }
-function handleEditProduct(product: any){
-  emit('handle-edit-product', true, product);
+
+function handleEditProduct(product: any) {
+  emit('handle-edit-product', true, product)
 }
 
 async function handleDeleteProduct(id: number) {
@@ -130,7 +147,7 @@ watch(searchQuery, fetchProducts)
 
 <template>
   <div class="flex-container">
-    <FilteringSideBar @update-filters="handleFiltersUpdate"/>
+    <FilteringSideBar @update-filters="handleFiltersUpdate" />
     <!-- Search bar -->
     <div class="row">
       <div class="column">
@@ -154,7 +171,8 @@ watch(searchQuery, fetchProducts)
 
     <!-- Products catalog -->
     <div class="row">
-      <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct" :products="products" />
+      <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
+               :products="products" />
     </div>
 
     <!-- No results message -->
