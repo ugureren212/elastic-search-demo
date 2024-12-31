@@ -18,6 +18,11 @@ class Command(BaseCommand):
                     "description": product.description,
                     "price": product.price,
                     "stock": product.stock,
+                    "category": product.category,
+                    "brand": product.brand,
+                    "color": product.color,
+                    "rating": product.rating,
+                    "is_available": product.is_available,
                 }
             )
-        self.stdout.write("Products indexed successfully!")
+        self.stdout.write(self.style.SUCCESS("Products indexed successfully!"))
