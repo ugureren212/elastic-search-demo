@@ -21,6 +21,11 @@ const appliedFilters = ref({
 
 const emit = defineEmits(['handle-create-product', 'handle-edit-product'])
 
+function handleLoadingProduct(productLoading: any) {
+  console.log("loading: ", productLoading)
+  loading.value = productLoading
+}
+
 async function handleFiltersUpdate(filters: any) {
   appliedFilters.value = filters
 
@@ -118,10 +123,6 @@ async function handleDeleteProduct(id: number) {
 }
 
 const fetchProducts = async () => {
-  if (!searchQuery.value) {
-    products.value = []
-    return
-  }
   loading.value = true
   try {
     const response = await axios.get('http://127.0.0.1:8000/api/products/search/', {
@@ -171,7 +172,7 @@ watch(searchQuery, fetchProducts)
 
     <!-- Products catalog -->
     <div class="row">
-      <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
+      <Catalog @handle-loading-product="handleLoadingProduct" @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
                :products="products" />
     </div>
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { defineEmits, defineProps } from 'vue'
+import { defineEmits, defineProps, ref } from 'vue';
 import Product from './Product.vue';
 
-const emit = defineEmits(['handle-delete-product','handle-edit-product']);
+const emit = defineEmits(['handle-delete-product', 'handle-edit-product', 'handle-loading-product']);
 
 defineProps({
   products: {
@@ -11,23 +11,47 @@ defineProps({
   },
 });
 
-function handleDeleteProduct(id: number){
+const isLoading = ref(false);
+
+function handleDeleteProduct(id: number) {
   emit('handle-delete-product', id);
 }
-function handleEditProduct(product: any){
+function handleEditProduct(product: any) {
   emit('handle-edit-product', product);
+}
+
+function handleScroll(event: Event) {
+  const container = event.target as HTMLElement;
+  const scrollTop = container.scrollTop;
+  const scrollHeight = container.scrollHeight;
+  const clientHeight = container.clientHeight;
+
+  if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoading.value) {
+    isLoading.value = true;
+    emit('handle-loading-product', true);
+
+    setTimeout(() => {
+      isLoading.value = false;
+      emit('handle-loading-product', false);
+    }, 2000);
+  }
 }
 </script>
 
 <template>
-  <div class="grid-container">
+  <div class="grid-container" @scroll="handleScroll">
     <div
       v-for="(product, index) in products"
       :key="index"
       class="grid-item"
     >
-      <Product @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct" :product="product" />
+      <Product
+        @handle-edit-product="handleEditProduct"
+        @handle-delete-product="handleDeleteProduct"
+        :product="product"
+      />
     </div>
+    <div v-if="isLoading" class="loading-message">Loading more products...</div>
   </div>
 </template>
 
@@ -52,10 +76,10 @@ function handleEditProduct(product: any){
   align-items: center;
 }
 
-.end-message {
+.loading-message {
   text-align: center;
   font-size: 1.2rem;
-  margin-top: 20px;
   color: gray;
+  grid-column: span 4; /* Center across all columns */
 }
 </style>
