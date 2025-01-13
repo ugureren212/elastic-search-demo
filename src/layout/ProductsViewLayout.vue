@@ -3,7 +3,7 @@ import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
 import FilteringSideBar from '@/components/FilteringSideBar.vue';
 import Product from '../components/Product.vue';
 import InputText from 'primevue/inputtext';
-import axios from 'axios'
+import axios from 'axios';
 
 const initialSearch = 'Product';
 const searchQuery = ref('');
@@ -19,7 +19,7 @@ const appliedFilters = ref({
   selectedRating: null,
   priceRange: [0, 500],
   inStock: false
-})
+});
 
 const emit = defineEmits(['handle-create-product', 'handle-edit-product']);
 
@@ -38,71 +38,43 @@ const fetchProductsPagination = async (isNewSearch = false) => {
     hasMore.value = true; // Reset the hasMore flag
   }
 
-  try {
-    const response = await fetch(
-      `http://127.0.0.1:8000/api/products/?page=${nextPage.value}&q=${encodeURIComponent(searchQuery.value)}`
-    );
-    if (!response.ok) {
-      throw new Error('Failed to fetch products');
-    }
-
-    const data = await response.json();
-
-    products.value.push(...data.results); // Append new products
-    nextPage.value += 1; // Increment page number
-    hasMore.value = !!data.next; // Check if there's a next page
-  } catch (error) {
-    console.error('Error fetching products:', error);
-  } finally {
-    loading.value = false;
-  }
-};
-
-async function handleFiltersUpdate(filters: any) {
-  appliedFilters.value = filters;
-
   const mustQueries: any[] = [];
 
   // Include search query for product names
   if (searchQuery.value) {
-    mustQueries.push({
-      match: { name: searchQuery.value }, // Adjust the field name to match your Elasticsearch mapping
-    });
+    mustQueries.push({ match: { name: searchQuery.value } });
   }
 
-  if (filters.selectedCategory?.length) {
-    const categories = filters.selectedCategory.map((c: any) => c.value || c);
+  if (appliedFilters.value.selectedCategory?.length) {
+    const categories = appliedFilters.value.selectedCategory.map((c: any) => c.value || c);
     mustQueries.push({ terms: { 'category.keyword': categories } });
   }
 
-  if (filters.selectedBrand?.length) {
-    const brands = filters.selectedBrand.map((b: any) => b.value || b);
+  if (appliedFilters.value.selectedBrand?.length) {
+    const brands = appliedFilters.value.selectedBrand.map((b: any) => b.value || b);
     mustQueries.push({ terms: { 'brand.keyword': brands } });
   }
 
-  if (filters.selectedColor?.length) {
-    const colors = filters.selectedColor.map((c: any) => c.value || c);
+  if (appliedFilters.value.selectedColor?.length) {
+    const colors = appliedFilters.value.selectedColor.map((c: any) => c.value || c);
     mustQueries.push({ terms: { 'color.keyword': colors } });
   }
 
-  // Fix for rating filter
-  if (filters.selectedRating?.length) {
-    const ratings = filters.selectedRating.map((r: any) => r.value || r);
-    mustQueries.push({
-      terms: { rating: ratings }, // Ensure 'rating' matches the field name in Elasticsearch
-    });
+  if (appliedFilters.value.selectedRating?.length) {
+    const ratings = appliedFilters.value.selectedRating.map((r: any) => r.value || r);
+    mustQueries.push({ terms: { rating: ratings } });
   }
 
-  if (filters.inStock !== null && filters.inStock !== undefined) {
-    mustQueries.push({ match: { is_available: filters.inStock } });
+  if (appliedFilters.value.inStock !== null && appliedFilters.value.inStock !== undefined) {
+    mustQueries.push({ match: { is_available: appliedFilters.value.inStock } });
   }
 
-  if (filters.priceRange?.length === 2) {
+  if (appliedFilters.value.priceRange?.length === 2) {
     mustQueries.push({
       range: {
         price: {
-          gte: filters.priceRange[0],
-          lte: filters.priceRange[1],
+          gte: appliedFilters.value.priceRange[0],
+          lte: appliedFilters.value.priceRange[1],
         },
       },
     });
@@ -112,27 +84,34 @@ async function handleFiltersUpdate(filters: any) {
     query: {
       bool: { must: mustQueries },
     },
+    from: (nextPage.value - 1) * 10, // Pagination offset
+    size: 16, // Items per page
   };
 
   try {
-    const response = await axios.post(
-      'http://127.0.0.1:9200/products/_search',
-      esQuery
-    );
-
+    const response = await axios.post('http://127.0.0.1:9200/products/_search', esQuery);
     const hits = response.data.hits.hits;
-    products.value = hits.map((hit: any) => ({
+    products.value.push(...hits.map((hit: any) => ({
       id: hit._id,
       ...hit._source,
-    }));
+    })));
+    nextPage.value += 1; // Increment page number
+    hasMore.value = hits.length > 0; // Check if more results exist
   } catch (error) {
-    console.error("Error fetching filtered products:", error.response?.data || error.message);
+    console.error('Error fetching paginated products:', error.response?.data || error.message);
+  } finally {
+    loading.value = false;
   }
+};
+
+async function handleFiltersUpdate(filters: any) {
+  appliedFilters.value = filters;
+  fetchProductsPagination(true); // Reset and fetch products with new filters
 }
 
 // Watch Search Query
 watch(searchQuery, () => {
-  handleFiltersUpdate(appliedFilters.value); // Refetch products with updated search query
+  fetchProductsPagination(true); // Refetch products with updated search query
 });
 
 // Handle Scroll Event
@@ -145,7 +124,6 @@ const handleScroll = () => {
     fetchProductsPagination();
   }
 };
-
 
 // Initialize Scroll Listener
 onMounted(() => {
@@ -166,6 +144,7 @@ onBeforeUnmount(() => {
   }
 });
 </script>
+
 
 
 <template>

@@ -86,7 +86,7 @@
 
       <!-- Action Buttons -->
       <div class="filter-actions">
-        <Button label="Apply Filters" icon="pi pi-check" class="p-button-success" />
+<!--        <Button label="Apply Filters" icon="pi pi-check" class="p-button-success" />-->
         <Button label="Reset" icon="pi pi-times" class="p-button-secondary" @click="resetFilters" />
       </div>
     </Sidebar>
