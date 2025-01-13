@@ -81,6 +81,6 @@ function handleScroll(event: Event) {
   text-align: center;
   font-size: 1.2rem;
   color: gray;
-  grid-column: span 4; /* Center across all columns */
+  grid-column: span 4;
 }
 </style>

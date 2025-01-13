@@ -145,15 +145,4 @@ function handleEditProduct(product: any) {
 .product-details strong {
   color: #555;
 }
-
-/* Availability styling */
-.available {
-  color: #4caf50;
-  font-weight: bold;
-}
-
-.unavailable {
-  color: #f44336;
-  font-weight: bold;
-}
 </style>

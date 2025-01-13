@@ -2,7 +2,6 @@
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import FilteringSideBar from '@/components/FilteringSideBar.vue'
 import Catalog from '../components/Catalog.vue'
-
 import InputText from 'primevue/inputtext'
 import axios from 'axios'
 
@@ -23,14 +22,6 @@ const appliedFilters = ref({
 })
 
 const emit = defineEmits(['handle-create-product', 'handle-edit-product'])
-
-function handleCreateProduct() {
-  emit('handle-create-product', true)
-}
-
-function handleEditProduct(product: any) {
-  emit('handle-edit-product', true, product)
-}
 
 const fetchProductsPagination = async (isNewSearch = false) => {
   if (loading.value || (!hasMore.value && !isNewSearch)) return // Prevent duplicate requests
@@ -113,6 +104,14 @@ async function handleFiltersUpdate(filters: any) {
   fetchProductsPagination(true) // Reset and fetch products with new filters
 }
 
+function handleCreateProduct() {
+  emit('handle-create-product', true)
+}
+
+function handleEditProduct(product: any) {
+  emit('handle-edit-product', true, product)
+}
+
 const handleScroll = () => {
   const container = document.querySelector('.grid-container')
   if (
@@ -137,6 +136,7 @@ onMounted(() => {
   searchQuery.value = initialSearch
   fetchProductsPagination()
 
+  // Mount scroller
   const container = document.querySelector('.grid-container')
   if (container) {
     container.addEventListener('scroll', handleScroll)
@@ -153,7 +153,7 @@ onBeforeUnmount(() => {
 
 // Watch Search Query
 watch(searchQuery, () => {
-  fetchProductsPagination(true) // Refetch products with updated search query
+  fetchProductsPagination(true)
 })
 </script>
 
@@ -162,7 +162,6 @@ watch(searchQuery, () => {
   <div class="flex-container">
     <FilteringSideBar @update-filters="handleFiltersUpdate" />
 
-    <!-- Search and Create Product -->
     <div class="row" style="width: 500px; padding-bottom: 20px; justify-content: center">
       <div class="input-container">
         <InputText
@@ -176,7 +175,6 @@ watch(searchQuery, () => {
       </div>
     </div>
 
-    <!-- Products catalog -->
     <div class="row" style="margin-bottom: 10px">
       <div v-if="!hasMore && !loading" class="end-message">No more products</div>
       <div v-else>
@@ -185,27 +183,22 @@ watch(searchQuery, () => {
       </div>
     </div>
 
-    <!-- Loading indicator -->
     <div v-if="loading" class="loading-indicator">Loading more products...</div>
 
-    <!-- No results message -->
     <div class="row" v-if="!loading && products.length === 0 && searchQuery">
       <p>No products found for "{{ searchQuery }}"</p>
     </div>
   </div>
 </template>
 
+
+<!--god bless anyone who's gonna try and understand this trash styling-->
 <style scoped>
 .row {
-  display: flex; /* Flex container to arrange children in a row */
-  align-items: center; /* Vertically align items */
-  justify-content: space-between; /* Add space between columns */
-  gap: 10px; /* Space between columns */
-}
-
-.column {
-  flex: 1; /* Each column takes equal width */
-  max-width: 50%; /* Optional: Limit column width */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .large-input {
@@ -215,24 +208,24 @@ watch(searchQuery, () => {
 }
 
 #create-product-btn {
-  background-color: #4CAF50; /* Green background */
-  border: 2px solid #ccc; /* Grey border */
-  color: white; /* White text */
-  font-size: 30px; /* Font size */
-  font-weight: bold; /* Bold text */
-  padding: 5px; /* Padding for spacing */
-  max-width: 100%; /* Button spans full width of its column */
-  border-radius: 5px; /* Rounded corners */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: all 0.3s ease; /* Smooth hover effect */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a cool effect */
+  background-color: #4CAF50;
+  border: 2px solid #ccc;
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  padding: 5px;
+  max-width: 100%;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #create-product-btn:hover {
-  background-color: #45a049; /* Slightly darker green on hover */
-  border-color: #aaa; /* Darker grey border on hover */
-  transform: scale(1.1); /* Slightly enlarge the button */
-  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+  background-color: #45a049;
+  border-color: #aaa;
+  transform: scale(1.1);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }
 
 .flex-container {
@@ -252,7 +245,7 @@ watch(searchQuery, () => {
 
 .input-container {
   display: flex;
-  align-items: center; /* Vertically align items */
-  gap: 5px; /* Space between input and button */
+  align-items: center;
+  gap: 5px;
 }
 </style>
