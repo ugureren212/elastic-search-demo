@@ -4,6 +4,7 @@ import FilteringSideBar from '@/components/FilteringSideBar.vue'
 import Catalog from '../components/Catalog.vue'
 import InputText from 'primevue/inputtext'
 import axios from 'axios'
+import Button from 'primevue/button'
 
 const initialSearch = 'Product'
 const searchQuery = ref('')
@@ -171,7 +172,7 @@ watch(searchQuery, () => {
           size="large"
           placeholder="Search for a product..."
         />
-        <button id="create-product-btn" @click="handleCreateProduct">+</button>
+        <Button id="create-product-btn" @click="handleCreateProduct">+</Button>
       </div>
     </div>
 
@@ -208,22 +209,13 @@ watch(searchQuery, () => {
 }
 
 #create-product-btn {
-  background-color: #4CAF50;
-  border: 2px solid #ccc;
-  color: white;
   font-size: 30px;
   font-weight: bold;
-  padding: 5px;
-  max-width: 100%;
-  border-radius: 5px;
+  padding: 5px 9px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 #create-product-btn:hover {
-  background-color: #45a049;
-  border-color: #aaa;
   transform: scale(1.1);
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
 }

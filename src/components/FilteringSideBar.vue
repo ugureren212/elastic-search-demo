@@ -4,7 +4,7 @@
     <Button
       icon="pi pi-filter"
       label="Filters"
-      class="p-button-rounded p-button-outlined toggle-button"
+      class="toggle-button"
       @click="visible = !visible"
     />
 
@@ -177,10 +177,6 @@ watch(
   top: 1rem;
   right: 1rem;
   z-index: 1000;
-  background: linear-gradient(to right, #6a11cb, #2575fc);
-  color: white;
-  font-weight: bold;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .toggle-button:hover {
