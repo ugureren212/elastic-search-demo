@@ -163,8 +163,8 @@ watch(searchQuery, () => {
     <FilteringSideBar @update-filters="handleFiltersUpdate" />
 
     <!-- Search and Create Product -->
-    <div class="row" style="width: 500px; padding-bottom: 20px">
-      <div class="column">
+    <div class="row" style="width: 500px; padding-bottom: 20px; justify-content: center">
+      <div class="input-container">
         <InputText
           v-model="searchQuery"
           class="large-input"
@@ -172,23 +172,21 @@ watch(searchQuery, () => {
           size="large"
           placeholder="Search for a product..."
         />
-      </div>
-      <div class="column">
         <button id="create-product-btn" @click="handleCreateProduct">+</button>
       </div>
     </div>
 
-
     <!-- Products catalog -->
     <div class="row" style="margin-bottom: 10px">
-      <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
-               :products="products" />
+      <div v-if="!hasMore && !loading" class="end-message">No more products</div>
+      <div v-else>
+        <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
+                 :products="products" />
+      </div>
     </div>
 
     <!-- Loading indicator -->
     <div v-if="loading" class="loading-indicator">Loading more products...</div>
-    <!-- End of products message -->
-    <div v-if="!hasMore && !loading" class="end-message">No more products</div>
 
     <!-- No results message -->
     <div class="row" v-if="!loading && products.length === 0 && searchQuery">
@@ -252,10 +250,9 @@ watch(searchQuery, () => {
   margin-top: 20px;
 }
 
-.end-message {
-  text-align: center;
-  font-size: 1.2rem;
-  margin-top: 20px;
-  color: gray;
+.input-container {
+  display: flex;
+  align-items: center; /* Vertically align items */
+  gap: 5px; /* Space between input and button */
 }
 </style>
