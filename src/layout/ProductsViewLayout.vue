@@ -1,14 +1,16 @@
 <script setup lang="ts">
-import { defineEmits, onMounted, ref, watch } from 'vue'
-import Catalog from '@/components/Catalog.vue'
-import InputText from 'primevue/inputtext'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
+import FilteringSideBar from '@/components/FilteringSideBar.vue';
+import Product from '../components/Product.vue';
+import InputText from 'primevue/inputtext';
 import axios from 'axios'
-import FilteringSideBar from '@/components/FilteringSideBar.vue'
 
-const initialSearch = 'Product'
-const searchQuery = ref('')
-const products = ref([])
-const loading = ref(false)
+const initialSearch = 'Product';
+const searchQuery = ref('');
+const products = ref([]);
+const nextPage = ref(1);
+const loading = ref(false);
+const hasMore = ref(true);
 
 const appliedFilters = ref({
   selectedCategory: null,
@@ -19,137 +21,158 @@ const appliedFilters = ref({
   inStock: false
 })
 
-const emit = defineEmits(['handle-create-product', 'handle-edit-product'])
+const emit = defineEmits(['handle-create-product', 'handle-edit-product']);
 
-function handleLoadingProduct(productLoading: any) {
-  console.log("loading: ", productLoading)
-  loading.value = productLoading
+function handleCreateProduct() {
+  emit('handle-create-product', true);
 }
 
+// Fetch Products
+const fetchProductsPagination = async (isNewSearch = false) => {
+  if (loading.value || (!hasMore.value && !isNewSearch)) return; // Prevent duplicate requests
+  loading.value = true;
+
+  if (isNewSearch) {
+    nextPage.value = 1; // Reset pagination
+    products.value = []; // Clear existing products
+    hasMore.value = true; // Reset the hasMore flag
+  }
+
+  try {
+    const response = await fetch(
+      `http://127.0.0.1:8000/api/products/?page=${nextPage.value}&q=${encodeURIComponent(searchQuery.value)}`
+    );
+    if (!response.ok) {
+      throw new Error('Failed to fetch products');
+    }
+
+    const data = await response.json();
+
+    products.value.push(...data.results); // Append new products
+    nextPage.value += 1; // Increment page number
+    hasMore.value = !!data.next; // Check if there's a next page
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
 async function handleFiltersUpdate(filters: any) {
-  appliedFilters.value = filters
+  appliedFilters.value = filters;
 
-  const mustQueries: any[] = []
+  const mustQueries: any[] = [];
 
-  // Handle multi-select fields
-  if (filters.selectedCategory && filters.selectedCategory.length > 0) {
-    const categories = filters.selectedCategory.map((c: any) => c.value || c)
+  // Include search query for product names
+  if (searchQuery.value) {
     mustQueries.push({
-      terms: { category: categories }
-    })
+      match: { name: searchQuery.value }, // Adjust the field name to match your Elasticsearch mapping
+    });
   }
 
-  if (filters.selectedBrand && filters.selectedBrand.length > 0) {
-    const brands = filters.selectedBrand.map((b: any) => b.value || b)
-    mustQueries.push({
-      terms: { brand: brands }
-    })
+  if (filters.selectedCategory?.length) {
+    const categories = filters.selectedCategory.map((c: any) => c.value || c);
+    mustQueries.push({ terms: { 'category.keyword': categories } });
   }
 
-  if (filters.selectedColor && filters.selectedColor.length > 0) {
-    const colors = filters.selectedColor.map((c: any) => c.value || c)
-    mustQueries.push({
-      terms: { color: colors }
-    })
+  if (filters.selectedBrand?.length) {
+    const brands = filters.selectedBrand.map((b: any) => b.value || b);
+    mustQueries.push({ terms: { 'brand.keyword': brands } });
   }
 
-  if (filters.selectedRating && filters.selectedRating.length > 0) {
-    mustQueries.push({
-      terms: { rating: filters.selectedRating }
-    })
+  if (filters.selectedColor?.length) {
+    const colors = filters.selectedColor.map((c: any) => c.value || c);
+    mustQueries.push({ terms: { 'color.keyword': colors } });
   }
 
-  // Availability filter
+  // Fix for rating filter
+  if (filters.selectedRating?.length) {
+    const ratings = filters.selectedRating.map((r: any) => r.value || r);
+    mustQueries.push({
+      terms: { rating: ratings }, // Ensure 'rating' matches the field name in Elasticsearch
+    });
+  }
+
   if (filters.inStock !== null && filters.inStock !== undefined) {
-    mustQueries.push({
-      match: { is_available: filters.inStock }
-    })
+    mustQueries.push({ match: { is_available: filters.inStock } });
   }
 
-  // Price range filter
-  if (filters.priceRange && filters.priceRange.length === 2) {
+  if (filters.priceRange?.length === 2) {
     mustQueries.push({
       range: {
         price: {
           gte: filters.priceRange[0],
-          lte: filters.priceRange[1]
-        }
-      }
-    })
+          lte: filters.priceRange[1],
+        },
+      },
+    });
   }
 
   const esQuery = {
     query: {
-      bool: {
-        must: mustQueries
-      }
-    }
-  }
+      bool: { must: mustQueries },
+    },
+  };
 
   try {
     const response = await axios.post(
       'http://127.0.0.1:9200/products/_search',
       esQuery
-    )
+    );
 
-    const hits = response.data.hits.hits
+    const hits = response.data.hits.hits;
     products.value = hits.map((hit: any) => ({
       id: hit._id,
-      ...hit._source
-    }))
-
-    console.log('Filtered Products:', products.value)
+      ...hit._source,
+    }));
   } catch (error) {
-    console.error('Error fetching filtered products:', error.response?.data || error.message)
+    console.error("Error fetching filtered products:", error.response?.data || error.message);
   }
 }
 
-function handleCreateProduct() {
-  emit('handle-create-product', true)
-}
+// Watch Search Query
+watch(searchQuery, () => {
+  handleFiltersUpdate(appliedFilters.value); // Refetch products with updated search query
+});
 
-function handleEditProduct(product: any) {
-  emit('handle-edit-product', true, product)
-}
-
-async function handleDeleteProduct(id: number) {
-  try {
-    await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
-    products.value = products.value.filter(product => product.id !== id)
-    console.log(`Product with ID ${id} deleted successfully from Elasticsearch.`)
-  } catch (error) {
-    console.error(`Error deleting product with ID ${id}:`, error)
+// Handle Scroll Event
+const handleScroll = () => {
+  const container = document.querySelector('.grid-container');
+  if (
+    container &&
+    container.scrollTop + container.clientHeight >= container.scrollHeight - 10
+  ) {
+    fetchProductsPagination();
   }
-}
+};
 
-const fetchProducts = async () => {
-  loading.value = true
-  try {
-    const response = await axios.get('http://127.0.0.1:8000/api/products/search/', {
-      params: { q: searchQuery.value }
-    })
-    // console.log('response.data: ', response)
-    products.value = response.data
-  } catch (error) {
-    console.error('Error fetching products:', error)
-    products.value = []
-  } finally {
-    loading.value = false
-  }
-}
 
+// Initialize Scroll Listener
 onMounted(() => {
-  searchQuery.value = initialSearch
-  fetchProducts()
-})
+  searchQuery.value = initialSearch;
+  fetchProductsPagination(); // Load the first batch of products
 
-watch(searchQuery, fetchProducts)
+  const container = document.querySelector('.grid-container');
+  if (container) {
+    container.addEventListener('scroll', handleScroll);
+  }
+});
+
+// Cleanup Scroll Listener
+onBeforeUnmount(() => {
+  const container = document.querySelector('.grid-container');
+  if (container) {
+    container.removeEventListener('scroll', handleScroll);
+  }
+});
 </script>
+
 
 <template>
   <div class="flex-container">
     <FilteringSideBar @update-filters="handleFiltersUpdate" />
-    <!-- Search bar -->
+
+    <!-- Search and Create Product -->
     <div class="row">
       <div class="column">
         <InputText
@@ -165,15 +188,19 @@ watch(searchQuery, fetchProducts)
       </div>
     </div>
 
-    <!-- Loading indicator -->
-    <!--    <div class="row" v-if="loading" style="margin-top: 20px; text-align: center;">-->
-    <!--      <p>Searching...</p>-->
-    <!--    </div>-->
-
-    <!-- Products catalog -->
-    <div class="row">
-      <Catalog @handle-loading-product="handleLoadingProduct" @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
-               :products="products" />
+    <!-- Product Grid -->
+    <div class="grid-container">
+      <div
+        v-for="(product, index) in products"
+        :key="index"
+        class="grid-item"
+      >
+        <Product :product="product" />
+      </div>
+      <!-- Loading indicator -->
+      <div v-if="loading" class="loading-indicator">Loading more products...</div>
+      <!-- End of products message -->
+      <div v-if="!hasMore && !loading" class="end-message">No more products</div>
     </div>
 
     <!-- No results message -->
@@ -229,5 +256,40 @@ watch(searchQuery, fetchProducts)
   justify-content: center;
   align-items: center;
   height: 100vh;
+}
+
+/* Grid container styling */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* 4 columns */
+  gap: 20px; /* Spacing between items */
+  justify-content: center; /* Center items horizontally */
+  align-items: start; /* Align items at the top */
+  width: 100%; /* Full width of the container */
+  padding: 20px; /* Optional: padding around the grid */
+  max-height: 55vh; /* Limit the visible height for scrolling */
+  overflow-y: auto; /* Enable scrolling */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  border-radius: 10px;
+}
+
+/* Grid item styling */
+.grid-item {
+  display: flex;
+  justify-content: center; /* Center content inside the grid item */
+  align-items: center; /* Center content inside the grid item */
+}
+
+.loading-indicator {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 20px;
+}
+
+.end-message {
+  text-align: center;
+  font-size: 1.2rem;
+  margin-top: 20px;
+  color: gray;
 }
 </style>
