@@ -173,7 +173,7 @@ onBeforeUnmount(() => {
     <FilteringSideBar @update-filters="handleFiltersUpdate" />
 
     <!-- Search and Create Product -->
-    <div class="row">
+    <div class="row" style="width: 500px; padding-bottom: 20px">
       <div class="column">
         <InputText
           v-model="searchQuery"
