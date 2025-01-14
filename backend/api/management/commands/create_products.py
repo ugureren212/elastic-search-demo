@@ -14,6 +14,7 @@ class Command(BaseCommand):
 
         products = []
         for i in range(10000):
+            id = random.randint(10, 10000000000)
             product_name = f"Product {i+1}"
             description = f"This is the description for {product_name}."
             price = round(random.uniform(10, 500), 2)
@@ -25,6 +26,7 @@ class Command(BaseCommand):
             is_available = random.choice(availability)
 
             product = Product(
+                id = id,
                 name=product_name,
                 description=description,
                 price=price,
@@ -45,3 +47,4 @@ class Command(BaseCommand):
             Product.objects.bulk_create(products)
 
         self.stdout.write(self.style.SUCCESS("10,000 products created successfully!"))
+

@@ -14,6 +14,7 @@ class Command(BaseCommand):
                 index=index_name,
                 id=product.id,
                 body={
+                    "id": product.id,
                     "name": product.name,
                     "description": product.description,
                     "price": product.price,
