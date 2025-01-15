@@ -1,26 +1,40 @@
 <script setup lang="ts">
-import Card from 'primevue/card';
-import { defineProps, defineEmits } from 'vue';
+import Card from 'primevue/card'
+import { defineProps, defineEmits } from 'vue'
 
-const emit = defineEmits(['handle-delete-product', 'handle-edit-product']);
+interface ProductType {
+  id: string
+  name: string
+  price: number
+  stock: number
+  description: string
+  category: string
+  brand: string
+  color: string
+  rating: number
+  is_available: boolean
+}
 
-defineProps({
-  product: Object,
-});
+const emit = defineEmits(['handle-delete-product', 'handle-edit-product'])
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const props = defineProps<{
+  product: ProductType
+}>()
 
 const randomColor = `#${Array.from({ length: 3 })
   .map(() => {
-    const value = Math.floor(Math.random() * 200);
-    return value.toString(16).padStart(2, '0');
+    const value = Math.floor(Math.random() * 200)
+    return value.toString(16).padStart(2, '0')
   })
-  .join('')}`;
+  .join('')}`
 
-function handleDeleteProduct(id: number) {
-  emit('handle-delete-product', id);
+function handleDeleteProduct(id: string) {
+  emit('handle-delete-product', id)
 }
 
-function handleEditProduct(product: any) {
-  emit('handle-edit-product', product);
+function handleEditProduct(product: ProductType) {
+  emit('handle-edit-product', product)
 }
 </script>
 
@@ -43,7 +57,12 @@ function handleEditProduct(product: any) {
         <p><strong>Brand:</strong> {{ product.brand }}</p>
         <p><strong>Color:</strong> {{ product.color }}</p>
         <p><strong>Rating:</strong> {{ product.rating }} / 5</p>
-        <p><strong>Availability:</strong> <span :class="product.is_available ? 'available' : 'unavailable'">{{ product.is_available ? 'In Stock' : 'Out of Stock' }}</span></p>
+        <p>
+          <strong>Availability:</strong>
+          <span :class="product.is_available ? 'available' : 'unavailable'">{{
+            product.is_available ? 'In Stock' : 'Out of Stock'
+          }}</span>
+        </p>
         <p><strong>Description:</strong> {{ product.description }}</p>
       </div>
     </template>
@@ -60,7 +79,9 @@ function handleEditProduct(product: any) {
   box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   background: #fff;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .product-card:hover {
@@ -102,7 +123,9 @@ function handleEditProduct(product: any) {
   width: 28px;
   height: 28px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
 }
 
 .deleteProductButton:hover {
@@ -122,7 +145,9 @@ function handleEditProduct(product: any) {
   width: 28px;
   height: 28px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.3s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.3s ease;
 }
 
 .createProductButton:hover {

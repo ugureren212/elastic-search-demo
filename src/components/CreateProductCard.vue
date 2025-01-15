@@ -7,18 +7,18 @@ import Dropdown from 'primevue/dropdown'
 import axios from 'axios'
 
 const cardName = ref('')
-const cardPrice = ref<number | null>(null)
-const cardStock = ref<number | null>(null)
+const cardPrice = ref<string | null>(null)
+const cardStock = ref<string | null>(null)
 const cardDescription = ref('')
-const cardCategory = ref(null)
-const cardBrand = ref(null)
-const cardColor = ref(null)
+const cardCategory = ref<string | null>(null)
+const cardBrand = ref<string | null>(null)
+const cardColor = ref<string | null>(null)
 const cardRating = ref<number | null>(null)
 const cardAvailability = ref<boolean | null>(null)
 
-const categories = ["Electronics", "Fashion", "Home", "Books", "Sports", "Toys"]
-const brands = ["BrandA", "BrandB", "BrandC", "BrandD", "BrandE"]
-const colors = ["Red", "Blue", "Green", "Black", "White", "Yellow"]
+const categories = ['Electronics', 'Fashion', 'Home', 'Books', 'Sports', 'Toys']
+const brands = ['BrandA', 'BrandB', 'BrandC', 'BrandD', 'BrandE']
+const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow']
 const ratings = [1, 2, 3, 4, 5]
 const availabilityOptions = [true, false]
 
@@ -48,7 +48,7 @@ function handleCloseCreateProductOverlay() {
   cardColor.value = null
   cardRating.value = null
   cardAvailability.value = null
-  emit("handle-remove-product")
+  emit('handle-remove-product')
   emit('handle-create-product', false)
 }
 
@@ -72,8 +72,8 @@ const handleSubmit = async () => {
 
   const newProduct = {
     name: cardName.value,
-    price: cardPrice.value,
-    stock: cardStock.value,
+    price: Number(cardPrice.value),
+    stock: Number(cardStock.value),
     description: cardDescription.value,
     category: cardCategory.value,
     brand: cardBrand.value,
@@ -95,10 +95,10 @@ const handleSubmit = async () => {
 onMounted(() => {
   if (editProduct) {
     cardName.value = editProduct.name
-    cardPrice.value = editProduct.price
-    cardStock.value = editProduct.stock
+    cardPrice.value = editProduct.price.toString()
+    cardStock.value = editProduct.stock.toString()
     cardDescription.value = editProduct.description
-    cardCategory.value = editProduct.category
+    cardCategory.value = editProduct.category || null
     cardBrand.value = editProduct.brand
     cardColor.value = editProduct.color
     cardRating.value = editProduct.rating
@@ -149,10 +149,14 @@ onMounted(() => {
         </div>
         <div class="flex-row">
           <p class="label">Availability</p>
-          <Dropdown :options="availabilityOptions" v-model="cardAvailability" placeholder="Select availability" />
+          <Dropdown
+            :options="availabilityOptions"
+            v-model="cardAvailability"
+            placeholder="Select availability"
+          />
         </div>
       </div>
-      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <div style="display: flex; gap: 10px; justify-content: flex-end">
         <Button label="Submit" @click="handleSubmit" />
         <div class="close-create-product-overlay" @click="handleCloseCreateProductOverlay">x</div>
       </div>

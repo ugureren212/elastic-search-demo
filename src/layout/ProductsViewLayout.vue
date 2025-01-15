@@ -1,63 +1,89 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
 import FilteringSideBar from '@/components/FilteringSideBar.vue'
-import Catalog from '../components/Catalog.vue'
+import ProductCatalog from '../components/ProductCatalog.vue'
 import InputText from 'primevue/inputtext'
 import axios from 'axios'
 import Button from 'primevue/button'
 
+interface Product {
+  id: string
+  name: string
+  price: number
+  stock: number
+  description: string
+  category: string
+  brand: string
+  color: string
+  rating: number
+  is_available: boolean
+}
+
+interface ElasticsearchHit {
+  _id: string
+  _source: Omit<Product, 'id'>
+}
+
+interface FilterState {
+  selectedCategory: { value: string }[] | null
+  selectedBrand: { value: string }[] | null
+  selectedColor: { value: string }[] | null
+  selectedRating: { value: number }[] | null
+  priceRange: [number, number]
+  inStock: boolean
+}
+
 const initialSearch = 'Product'
 const searchQuery = ref('')
-const products = ref([])
+const products = ref<Product[]>([])
 const nextPage = ref(1)
 const loading = ref(false)
 const hasMore = ref(true)
 
-const appliedFilters = ref({
+const appliedFilters = ref<FilterState>({
   selectedCategory: null,
   selectedBrand: null,
   selectedColor: null,
   selectedRating: null,
   priceRange: [0, 500],
-  inStock: false
+  inStock: false,
 })
 
 const emit = defineEmits(['handle-create-product', 'handle-edit-product'])
 
 const fetchProductsPagination = async (isNewSearch = false) => {
-  if (loading.value || (!hasMore.value && !isNewSearch)) return // Prevent duplicate requests
+  if (loading.value || (!hasMore.value && !isNewSearch)) return
   loading.value = true
 
   if (isNewSearch) {
-    nextPage.value = 1 // Reset pagination
-    products.value = [] // Clear existing products
-    hasMore.value = true // Reset the hasMore flag
+    nextPage.value = 1
+    products.value = []
+    hasMore.value = true
   }
 
-  const mustQueries: any[] = []
+  const mustQueries: Record<string, unknown>[] = []
 
-  // Include search query for product names
   if (searchQuery.value) {
     mustQueries.push({ match: { name: searchQuery.value } })
   }
 
   if (appliedFilters.value.selectedCategory?.length) {
-    const categories = appliedFilters.value.selectedCategory.map((c: any) => c.value || c)
+    const categories = appliedFilters.value.selectedCategory.map((c) => c.value)
     mustQueries.push({ terms: { 'category.keyword': categories } })
   }
 
   if (appliedFilters.value.selectedBrand?.length) {
-    const brands = appliedFilters.value.selectedBrand.map((b: any) => b.value || b)
+    const brands = appliedFilters.value.selectedBrand.map((b) => b.value)
     mustQueries.push({ terms: { 'brand.keyword': brands } })
   }
 
   if (appliedFilters.value.selectedColor?.length) {
-    const colors = appliedFilters.value.selectedColor.map((c: any) => c.value || c)
+    const colors = appliedFilters.value.selectedColor.map((c) => c.value)
     mustQueries.push({ terms: { 'color.keyword': colors } })
   }
 
   if (appliedFilters.value.selectedRating?.length) {
-    const ratings = appliedFilters.value.selectedRating.map((r: any) => r.value || r)
+    const ratings = appliedFilters.value.selectedRating.map((r) => r.value)
     mustQueries.push({ terms: { rating: ratings } })
   }
 
@@ -70,66 +96,72 @@ const fetchProductsPagination = async (isNewSearch = false) => {
       range: {
         price: {
           gte: appliedFilters.value.priceRange[0],
-          lte: appliedFilters.value.priceRange[1]
-        }
-      }
+          lte: appliedFilters.value.priceRange[1],
+        },
+      },
     })
   }
 
   const esQuery = {
     query: {
-      bool: { must: mustQueries }
+      bool: { must: mustQueries },
     },
-    from: (nextPage.value - 1) * 10, // Pagination offset
-    size: 16 // Items per page
+    from: (nextPage.value - 1) * 10,
+    size: 16,
   }
 
   try {
-    const response = await axios.post('http://127.0.0.1:9200/products/_search', esQuery)
+    const response = await axios.post<{ hits: { hits: ElasticsearchHit[] } }>(
+      'http://127.0.0.1:9200/products/_search',
+      esQuery,
+    )
     const hits = response.data.hits.hits
-    products.value.push(...hits.map((hit: any) => ({
-      id: hit._id,
-      ...hit._source
-    })))
-    nextPage.value += 1 // Increment page number
-    hasMore.value = hits.length > 0 // Check if more results exist
+    products.value.push(
+      ...hits.map((hit) => ({
+        id: hit._id,
+        ...hit._source,
+      })),
+    )
+    nextPage.value += 1
+    hasMore.value = hits.length > 0
   } catch (error) {
-    console.error('Error fetching paginated products:', error.response?.data || error.message)
+    if (error instanceof Error) {
+      console.error('Error fetching paginated products:', error.message)
+    }
   } finally {
     loading.value = false
   }
 }
 
-async function handleFiltersUpdate(filters: any) {
+function handleFiltersUpdate(filters: FilterState) {
   appliedFilters.value = filters
-  fetchProductsPagination(true) // Reset and fetch products with new filters
+  fetchProductsPagination(true)
 }
 
 function handleCreateProduct() {
   emit('handle-create-product', true)
 }
 
-function handleEditProduct(product: any) {
+function handleEditProduct(product: Product) {
   emit('handle-edit-product', true, product)
 }
 
 const handleScroll = () => {
   const container = document.querySelector('.grid-container')
-  if (
-    container &&
-    container.scrollTop + container.clientHeight >= container.scrollHeight - 10
-  ) {
+  if (container && container.scrollTop + container.clientHeight >= container.scrollHeight - 10) {
     fetchProductsPagination()
   }
 }
 
-async function handleDeleteProduct(id: number) {
+async function handleDeleteProduct(id: string) {
   try {
     await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
-    products.value = products.value.filter(product => product.id !== id)
+    products.value = products.value.filter((product) => product.id !== id)
     console.log(`Product with ID ${id} deleted successfully from Elasticsearch.`)
   } catch (error) {
-    console.error(`Error deleting product with ID ${id}:`, error)
+    if (error instanceof Error) {
+      console.error(`Error deleting product with ID ${id}:`, error.message)
+    }
   }
 }
 
@@ -137,14 +169,12 @@ onMounted(() => {
   searchQuery.value = initialSearch
   fetchProductsPagination()
 
-  // Mount scroller
   const container = document.querySelector('.grid-container')
   if (container) {
     container.addEventListener('scroll', handleScroll)
   }
 })
 
-// Cleanup Scroll Listener
 onBeforeUnmount(() => {
   const container = document.querySelector('.grid-container')
   if (container) {
@@ -152,12 +182,10 @@ onBeforeUnmount(() => {
   }
 })
 
-// Watch Search Query
 watch(searchQuery, () => {
   fetchProductsPagination(true)
 })
 </script>
-
 
 <template>
   <div class="flex-container">
@@ -179,8 +207,11 @@ watch(searchQuery, () => {
     <div class="row" style="margin-bottom: 10px">
       <div v-if="!hasMore && !loading" class="end-message">No more products</div>
       <div v-else>
-        <Catalog @handle-edit-product="handleEditProduct" @handle-delete-product="handleDeleteProduct"
-                 :products="products" />
+        <ProductCatalog
+          @handle-edit-product="handleEditProduct"
+          @handle-delete-product="handleDeleteProduct"
+          :products="products"
+        />
       </div>
     </div>
 
@@ -192,8 +223,6 @@ watch(searchQuery, () => {
   </div>
 </template>
 
-
-<!--god bless anyone who's gonna try and understand this trash styling-->
 <style scoped>
 .row {
   display: flex;
