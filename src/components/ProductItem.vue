@@ -45,7 +45,7 @@ function handleEditProduct(product: ProductType) {
         <p class="product-name">{{ product.name }}</p>
         <div class="action-buttons">
           <div class="deleteProductButton" @click="handleDeleteProduct(product.id)">x</div>
-          <div class="createProductButton" @click="handleEditProduct(product)">✏️</div>
+          <div class="editProductButton" @click="handleEditProduct(product)">✏️</div>
         </div>
       </div>
     </template>
@@ -133,7 +133,7 @@ function handleEditProduct(product: ProductType) {
   transform: scale(1.1);
 }
 
-.createProductButton {
+.editProductButton {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -150,7 +150,7 @@ function handleEditProduct(product: ProductType) {
     transform 0.3s ease;
 }
 
-.createProductButton:hover {
+.editProductButton:hover {
   background: #388e3c;
   transform: scale(1.1);
 }

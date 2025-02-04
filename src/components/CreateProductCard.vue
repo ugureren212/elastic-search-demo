@@ -7,8 +7,8 @@ import Dropdown from 'primevue/dropdown'
 import axios from 'axios'
 
 const cardName = ref('')
-const cardPrice = ref<string | null>(null)
-const cardStock = ref<string | null>(null)
+const cardPrice = ref<number | null>(null)
+const cardStock = ref<number | null>(null)
 const cardDescription = ref('')
 const cardCategory = ref<string | null>(null)
 const cardBrand = ref<string | null>(null)
@@ -37,6 +37,21 @@ const { editProduct } = defineProps<{
     is_available: boolean
   }
 }>()
+
+function handleRandomValueGenerator() {
+  cardName.value = `${Math.random().toString(36).substring(2, 7)}`
+  cardPrice.value = parseFloat((Math.random() * 1000).toFixed(2))
+  cardStock.value = Math.floor(Math.random() * 100)
+  cardDescription.value = ` ${Math.random().toString(36).substring(2, 15)}`
+  const categories = ['Electronics', 'Fashion', 'Home', 'Books', 'Sports']
+  cardCategory.value = categories[Math.floor(Math.random() * categories.length)]
+  const brands = ['BrandA', 'BrandB', 'BrandC', 'BrandD', 'BrandE']
+  cardBrand.value = brands[Math.floor(Math.random() * brands.length)]
+  const colors = ['Red', 'Blue', 'Green', 'Yellow']
+  cardColor.value = colors[Math.floor(Math.random() * colors.length)]
+  cardRating.value = Math.floor(Math.random() * 5) + 1
+  cardAvailability.value = Math.random() > 0.5
+}
 
 function handleCloseCreateProductOverlay() {
   cardName.value = ''
@@ -84,6 +99,7 @@ const handleSubmit = async () => {
 
   try {
     await axios.post('http://127.0.0.1:9200/products/_doc', newProduct)
+    console.log('newProduct: ', newProduct)
     alert('Product successfully added!')
     handleCloseCreateProductOverlay()
   } catch (error) {
@@ -95,8 +111,8 @@ const handleSubmit = async () => {
 onMounted(() => {
   if (editProduct) {
     cardName.value = editProduct.name
-    cardPrice.value = editProduct.price.toString()
-    cardStock.value = editProduct.stock.toString()
+    cardPrice.value = editProduct.price
+    cardStock.value = editProduct.stock
     cardDescription.value = editProduct.description
     cardCategory.value = editProduct.category || null
     cardBrand.value = editProduct.brand
@@ -157,6 +173,7 @@ onMounted(() => {
         </div>
       </div>
       <div style="display: flex; gap: 10px; justify-content: flex-end">
+        <Button label="Random" @click="handleRandomValueGenerator" />
         <Button label="Submit" @click="handleSubmit" />
         <div class="close-create-product-overlay" @click="handleCloseCreateProductOverlay">x</div>
       </div>
