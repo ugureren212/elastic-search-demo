@@ -4,14 +4,13 @@ import { ref } from 'vue'
 import CreateProductCard from '@/components/CreateProductCard.vue'
 
 const createProductOverlay = ref(false)
-const editProduct = ref<Record<string, any> | undefined | null>(undefined)
+const editProduct = ref(<Record<string, any> | undefined | null>undefined)
 
-function handleRemoveProduct() {
-  editProduct.value = null
-}
-
-function handleCreateProductOverlay(closeOverlay: boolean) {
-  createProductOverlay.value = closeOverlay
+function handleCreateProductOverlay(openOverlay: boolean) {
+  if (!openOverlay) {
+    editProduct.value = undefined
+  }
+  createProductOverlay.value = openOverlay
 }
 
 function handleEditProduct(closeOverlay: boolean, product: any) {
@@ -25,7 +24,6 @@ function handleEditProduct(closeOverlay: boolean, product: any) {
     <div id="create-product-overlay" v-if="createProductOverlay">
       <CreateProductCard
         :edit-product="editProduct"
-        @handle-remove-product="handleRemoveProduct"
         @handle-create-product-overlay="handleCreateProductOverlay"
       />
     </div>

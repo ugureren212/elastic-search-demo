@@ -23,14 +23,11 @@ const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow']
 const ratings = [1, 2, 3, 4, 5]
 const availabilityOptions = [true, false]
 
-const emit = defineEmits([
-  'handle-remove-product',
-  'handle-create-product-overlay',
-  'handle-edit-product',
-])
+const emit = defineEmits(['handle-create-product-overlay', 'handle-edit-product'])
 
 const { editProduct } = defineProps<{
   editProduct?: {
+    id: number
     name: string
     price: number
     stock: number
@@ -91,7 +88,7 @@ const handleSubmit = async () => {
   emit('handle-create-product-overlay', false)
 
   const product = {
-    id: cardID.value,
+    id: editProduct?.id || cardID.value,
     name: cardName.value,
     price: cardPrice.value,
     stock: cardStock.value,
