@@ -31,9 +31,12 @@ interface FilterState {
   selectedRating: { value: number }[] | null
   priceRange: [number, number]
   inStock: boolean
+  notInStock: boolean
 }
 
-const initialSearch = 'Product'
+const fetchProducts = defineProps(['fetchProducts'])
+
+const initialSearch = ''
 const searchQuery = ref('')
 const products = ref<Product[]>([])
 const nextPage = ref(1)
@@ -46,10 +49,11 @@ const appliedFilters = ref<FilterState>({
   selectedColor: null,
   selectedRating: null,
   priceRange: [0, 500],
-  inStock: false,
+  inStock: true,
+  notInStock: true,
 })
 
-const emit = defineEmits(['handle-create-product', 'handle-edit-product'])
+const emit = defineEmits(['handle-create-product-overlay', 'handle-edit-product'])
 
 const fetchProductsPagination = async (isNewSearch = false) => {
   if (loading.value || (!hasMore.value && !isNewSearch)) return
@@ -87,8 +91,13 @@ const fetchProductsPagination = async (isNewSearch = false) => {
     mustQueries.push({ terms: { rating: ratings } })
   }
 
-  if (appliedFilters.value.inStock !== null && appliedFilters.value.inStock !== undefined) {
-    mustQueries.push({ match: { is_available: appliedFilters.value.inStock } })
+  if (appliedFilters.value.inStock !== null || appliedFilters.value.inStock !== undefined) {
+    if (appliedFilters.value.inStock === true && appliedFilters.value.notInStock === true) {
+    } else if (appliedFilters.value.inStock === true) {
+      mustQueries.push({ match: { is_available: true } })
+    } else if (appliedFilters.value.notInStock === true) {
+      mustQueries.push({ match: { is_available: false } })
+    }
   }
 
   if (appliedFilters.value.priceRange?.length === 2) {
@@ -138,8 +147,8 @@ function handleFiltersUpdate(filters: FilterState) {
   fetchProductsPagination(true)
 }
 
-function handleCreateProduct() {
-  emit('handle-create-product', true)
+function handleCreateProductOverlay() {
+  emit('handle-create-product-overlay', true)
 }
 
 function handleEditProduct(product: Product) {
@@ -182,7 +191,7 @@ onBeforeUnmount(() => {
   }
 })
 
-watch(searchQuery, () => {
+watch([searchQuery, fetchProducts], () => {
   fetchProductsPagination(true)
 })
 </script>
@@ -200,7 +209,7 @@ watch(searchQuery, () => {
           size="large"
           placeholder="Search for a product..."
         />
-        <Button id="create-product-btn" @click="handleCreateProduct">+</Button>
+        <Button id="create-product-btn" @click="handleCreateProductOverlay">+</Button>
       </div>
     </div>
 

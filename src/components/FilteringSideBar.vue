@@ -1,12 +1,7 @@
 <template>
   <div>
     <!-- Sidebar Toggle Button -->
-    <Button
-      icon="pi pi-filter"
-      label="Filters"
-      class="toggle-button"
-      @click="visible = !visible"
-    />
+    <Button icon="pi pi-filter" label="Filters" class="toggle-button" @click="visible = !visible" />
 
     <!-- Sidebar Component -->
     <Sidebar v-model:visible="visible" position="right">
@@ -79,14 +74,15 @@
 
       <!-- Availability Filter -->
       <div class="filter-section">
-        <h4>Availability</h4>
         <Checkbox v-model="inStock" binary />
-        <label>{{ inStock ? "Only In Stock" : "  All Products" }}</label>
+        <label> In stock</label>
+        <Checkbox style="margin-left: 10px" v-model="notInStock" binary />
+        <label> Out of stock </label>
       </div>
 
       <!-- Action Buttons -->
       <div class="filter-actions">
-<!--        <Button label="Apply Filters" icon="pi pi-check" class="p-button-success" />-->
+        <!--<Button label="Apply Filters" icon="pi pi-check" class="p-button-success" />-->
         <Button label="Reset" icon="pi pi-times" class="p-button-secondary" @click="resetFilters" />
       </div>
     </Sidebar>
@@ -109,7 +105,7 @@ const categories = ref([
   { label: 'Home', value: 'Home' },
   { label: 'Books', value: 'Books' },
   { label: 'Sports', value: 'Sports' },
-  { label: 'Toys', value: 'Toys' }
+  { label: 'Toys', value: 'Toys' },
 ])
 
 const brands = ref([
@@ -117,7 +113,7 @@ const brands = ref([
   { label: 'BrandB', value: 'BrandB' },
   { label: 'BrandC', value: 'BrandC' },
   { label: 'BrandD', value: 'BrandD' },
-  { label: 'BrandE', value: 'BrandE' }
+  { label: 'BrandE', value: 'BrandE' },
 ])
 
 const colors = ref([
@@ -126,7 +122,7 @@ const colors = ref([
   { label: 'Green', value: 'Green' },
   { label: 'Black', value: 'Black' },
   { label: 'White', value: 'White' },
-  { label: 'Yellow', value: 'Yellow' }
+  { label: 'Yellow', value: 'Yellow' },
 ])
 
 const ratings = ref([
@@ -134,7 +130,7 @@ const ratings = ref([
   { label: '2 Stars', value: 2 },
   { label: '3 Stars', value: 3 },
   { label: '4 Stars', value: 4 },
-  { label: '5 Stars', value: 5 }
+  { label: '5 Stars', value: 5 },
 ])
 
 const selectedCategory = ref([])
@@ -142,7 +138,8 @@ const selectedBrand = ref([])
 const selectedColor = ref([])
 const selectedRating = ref([])
 const priceRange = ref([0, 500])
-const inStock = ref(false)
+const inStock = ref(true)
+const notInStock = ref(true)
 
 const emit = defineEmits(['update-filters'])
 
@@ -153,21 +150,23 @@ function resetFilters() {
   selectedRating.value = []
   priceRange.value = [0, 500]
   inStock.value = false
+  notInStock.value = false
 }
 
 watch(
-  [selectedCategory, selectedBrand, selectedColor, selectedRating, priceRange, inStock],
-  ([newCategory, newBrand, newColor, newRating, newPriceRange, newStock]) => {
+  [selectedCategory, selectedBrand, selectedColor, selectedRating, priceRange, inStock, notInStock],
+  ([newCategory, newBrand, newColor, newRating, newPriceRange, newInStock, newNotInStock]) => {
     emit('update-filters', {
       selectedCategory: newCategory,
       selectedBrand: newBrand,
       selectedColor: newColor,
       selectedRating: newRating,
       priceRange: newPriceRange,
-      inStock: newStock
+      inStock: newInStock,
+      notInStock: newNotInStock,
     })
   },
-  { deep: true }
+  { deep: true },
 )
 </script>
 
@@ -194,7 +193,7 @@ watch(
   gap: 10px;
 }
 
-p-multiselect-header{
+p-multiselect-header {
   display: none;
 }
 </style>

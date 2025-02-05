@@ -6,6 +6,7 @@ import Button from 'primevue/button'
 import Dropdown from 'primevue/dropdown'
 import axios from 'axios'
 
+const cardID = ref<number | null>(null)
 const cardName = ref('')
 const cardPrice = ref<number | null>(null)
 const cardStock = ref<number | null>(null)
@@ -22,7 +23,11 @@ const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow']
 const ratings = [1, 2, 3, 4, 5]
 const availabilityOptions = [true, false]
 
-const emit = defineEmits(['handle-remove-product', 'handle-create-product', 'handle-edit-product'])
+const emit = defineEmits([
+  'handle-remove-product',
+  'handle-create-product-overlay',
+  'handle-edit-product',
+])
 
 const { editProduct } = defineProps<{
   editProduct?: {
@@ -39,6 +44,7 @@ const { editProduct } = defineProps<{
 }>()
 
 function handleRandomValueGenerator() {
+  cardID.value = Math.floor(Date.now() + Math.random() * 1000)
   cardName.value = `${Math.random().toString(36).substring(2, 7)}`
   cardPrice.value = parseFloat((Math.random() * 1000).toFixed(2))
   cardStock.value = Math.floor(Math.random() * 100)
@@ -63,8 +69,7 @@ function handleCloseCreateProductOverlay() {
   cardColor.value = null
   cardRating.value = null
   cardAvailability.value = null
-  emit('handle-remove-product')
-  emit('handle-create-product', false)
+  emit('handle-create-product-overlay', false)
 }
 
 const handleSubmit = async () => {
@@ -83,12 +88,13 @@ const handleSubmit = async () => {
     return
   }
 
-  emit('handle-create-product', false)
+  emit('handle-create-product-overlay', false)
 
-  const newProduct = {
+  const product = {
+    id: cardID.value,
     name: cardName.value,
-    price: Number(cardPrice.value),
-    stock: Number(cardStock.value),
+    price: cardPrice.value,
+    stock: cardStock.value,
     description: cardDescription.value,
     category: cardCategory.value,
     brand: cardBrand.value,
@@ -98,8 +104,8 @@ const handleSubmit = async () => {
   }
 
   try {
-    await axios.post('http://127.0.0.1:9200/products/_doc', newProduct)
-    console.log('newProduct: ', newProduct)
+    await axios.post('http://127.0.0.1:9200/products/_doc?refresh=wait_for', product)
+    console.log('newProduct: ', product)
     alert('Product successfully added!')
     handleCloseCreateProductOverlay()
   } catch (error) {

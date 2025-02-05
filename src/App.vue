@@ -10,7 +10,7 @@ function handleRemoveProduct() {
   editProduct.value = null
 }
 
-function handleCreateProduct(closeOverlay: boolean) {
+function handleCreateProductOverlay(closeOverlay: boolean) {
   createProductOverlay.value = closeOverlay
 }
 
@@ -23,10 +23,17 @@ function handleEditProduct(closeOverlay: boolean, product: any) {
 <template>
   <div>
     <div id="create-product-overlay" v-if="createProductOverlay">
-      <CreateProductCard :edit-product="editProduct"  @handle-remove-product="handleRemoveProduct" @handle-create-product="handleCreateProduct"/>
+      <CreateProductCard
+        :edit-product="editProduct"
+        @handle-remove-product="handleRemoveProduct"
+        @handle-create-product-overlay="handleCreateProductOverlay"
+      />
     </div>
     <div v-else>
-      <ProductsViewLayout @handle-edit-product="handleEditProduct" @handle-create-product="handleCreateProduct" />
+      <ProductsViewLayout
+        @handle-edit-product="handleEditProduct"
+        @handle-create-product-overlay="handleCreateProductOverlay"
+      />
     </div>
   </div>
 </template>
