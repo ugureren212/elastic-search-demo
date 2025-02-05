@@ -165,7 +165,7 @@ const handleScroll = () => {
 async function handleDeleteProduct(id: string) {
   try {
     await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
-    products.value = products.value.filter((product) => product.id !== id)
+    products.value = products.value.filter((product) => product._id !== id)
     console.log(`Product with ID ${id} deleted successfully from Elasticsearch.`)
   } catch (error) {
     if (error instanceof Error) {

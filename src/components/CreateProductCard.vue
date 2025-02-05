@@ -104,7 +104,7 @@ const handleSubmit = async () => {
   }
 
   try {
-    await axios.post('http://127.0.0.1:9200/products/_doc?refresh=wait_for', product)
+    await axios.post(`http://127.0.0.1:9200/products/_doc/${product.id}?refresh=wait_for`, product)
     console.log('newProduct: ', product)
     alert('Product successfully added!')
     handleCloseCreateProductOverlay()
