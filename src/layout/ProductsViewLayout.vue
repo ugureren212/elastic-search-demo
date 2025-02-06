@@ -53,7 +53,7 @@ const appliedFilters = ref<FilterState>({
   notInStock: true,
 })
 
-const emit = defineEmits(['handle-create-product-overlay', 'handle-edit-product'])
+const emit = defineEmits(['handle-close-create-product-overlay', 'handle-edit-product'])
 
 const fetchProductsPagination = async (isNewSearch = false) => {
   if (loading.value || (!hasMore.value && !isNewSearch)) return
@@ -147,8 +147,8 @@ function handleFiltersUpdate(filters: FilterState) {
   fetchProductsPagination(true)
 }
 
-function handleCreateProductOverlay() {
-  emit('handle-create-product-overlay', true)
+function handleCloseCreateProductOverlay() {
+  emit('handle-close-create-product-overlay', false)
 }
 
 function handleEditProduct(product: Product) {
@@ -209,7 +209,7 @@ watch([searchQuery, fetchProducts], () => {
           size="large"
           placeholder="Search for a product..."
         />
-        <Button id="create-product-btn" @click="handleCreateProductOverlay">+</Button>
+        <Button id="create-product-btn" @click="handleCloseCreateProductOverlay">+</Button>
       </div>
     </div>
 

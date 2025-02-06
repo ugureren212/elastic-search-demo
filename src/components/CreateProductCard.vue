@@ -23,7 +23,7 @@ const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow']
 const ratings = [1, 2, 3, 4, 5]
 const availabilityOptions = [true, false]
 
-const emit = defineEmits(['handle-create-product-overlay', 'handle-edit-product'])
+const emit = defineEmits(['handle-close-create-product-overlay', 'handle-edit-product'])
 
 const { editProduct } = defineProps<{
   editProduct?: {
@@ -66,7 +66,7 @@ function handleCloseCreateProductOverlay() {
   cardColor.value = null
   cardRating.value = null
   cardAvailability.value = null
-  emit('handle-create-product-overlay', false)
+  emit('handle-close-create-product-overlay', true)
 }
 
 const handleSubmit = async () => {
@@ -84,8 +84,6 @@ const handleSubmit = async () => {
     alert('Please fill out all fields')
     return
   }
-
-  emit('handle-create-product-overlay', false)
 
   const product = {
     id: editProduct?.id || cardID.value,
