@@ -4,7 +4,14 @@ import { ref } from 'vue'
 import CreateProductCard from '@/components/CreateProductCard.vue'
 
 const createProductOverlay = ref(false)
+const fetchProducts = ref(false)
+
 const editProduct = ref(<Record<string, any> | undefined | null>undefined)
+
+function handleFetchProducts(fetchProductsBool: boolean) {
+  console.log('app level: ', fetchProductsBool)
+  fetchProducts.value = !fetchProductsBool
+}
 
 function handleCloseCreateProductOverlay(closeOverlay: boolean) {
   if (closeOverlay) {
@@ -21,15 +28,16 @@ function handleEditProduct(closeOverlay: boolean, product: any) {
 
 <template>
   <div>
-    <p>editProduct -- {{ editProduct }}</p>
     <div id="create-product-overlay" v-if="createProductOverlay">
       <CreateProductCard
         :edit-product="editProduct"
         @handle-close-create-product-overlay="handleCloseCreateProductOverlay"
+        @handle-fetch-products="handleFetchProducts"
       />
     </div>
     <div v-else>
       <ProductsViewLayout
+        :fetchProducts="fetchProducts"
         @handle-edit-product="handleEditProduct"
         @handle-close-create-product-overlay="handleCloseCreateProductOverlay"
       />

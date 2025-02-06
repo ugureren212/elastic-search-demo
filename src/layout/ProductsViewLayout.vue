@@ -192,7 +192,9 @@ onBeforeUnmount(() => {
 })
 
 watch([searchQuery, fetchProducts], () => {
-  fetchProductsPagination(true)
+  if (fetchProducts) {
+    fetchProductsPagination()
+  }
 })
 </script>
 

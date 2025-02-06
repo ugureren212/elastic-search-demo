@@ -23,7 +23,11 @@ const colors = ['Red', 'Blue', 'Green', 'Black', 'White', 'Yellow']
 const ratings = [1, 2, 3, 4, 5]
 const availabilityOptions = [true, false]
 
-const emit = defineEmits(['handle-close-create-product-overlay', 'handle-edit-product'])
+const emit = defineEmits([
+  'handle-close-create-product-overlay',
+  'handle-edit-product',
+  'handle-fetch-products',
+])
 
 const { editProduct } = defineProps<{
   editProduct?: {
@@ -102,6 +106,7 @@ const handleSubmit = async () => {
     await axios.post(`http://127.0.0.1:9200/products/_doc/${product.id}?refresh=wait_for`, product)
     console.log('newProduct: ', product)
     alert('Product successfully added!')
+    emit('handle-fetch-products', true)
     handleCloseCreateProductOverlay()
   } catch (error) {
     console.error('Error adding product:', error)
