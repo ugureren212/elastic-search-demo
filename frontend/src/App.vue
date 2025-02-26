@@ -9,7 +9,6 @@ const fetchProducts = ref(false)
 const editProduct = ref(<Record<string, any> | undefined | null>undefined)
 
 function handleFetchProducts(fetchProductsBool: boolean) {
-  console.log('app level: ', fetchProductsBool)
   fetchProducts.value = !fetchProductsBool
 }
 

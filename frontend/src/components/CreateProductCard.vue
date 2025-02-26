@@ -143,7 +143,7 @@ onMounted(() => {
       <div class="flex-container">
         <div class="flex-row">
           <p class="label">Price</p>
-          <InputText type="number" v-model="cardPrice" />
+          <InputText type="number" v-model="cardPrice" max="1000"/>
         </div>
         <div class="flex-row">
           <p class="label">Stock</p>

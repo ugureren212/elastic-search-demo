@@ -34,7 +34,7 @@ interface FilterState {
   notInStock: boolean
 }
 
-const fetchProducts = defineProps(['fetchProducts'])
+const props = defineProps(['fetchProducts'])
 
 const initialSearch = ''
 const searchQuery = ref('')
@@ -48,7 +48,7 @@ const appliedFilters = ref<FilterState>({
   selectedBrand: null,
   selectedColor: null,
   selectedRating: null,
-  priceRange: [0, 500],
+  priceRange: [0, 1000],
   inStock: true,
   notInStock: true,
 })
@@ -125,6 +125,7 @@ const fetchProductsPagination = async (isNewSearch = false) => {
       esQuery,
     )
     const hits = response.data.hits.hits
+
     products.value.push(
       ...hits.map((hit) => ({
         id: hit._id,
@@ -164,15 +165,20 @@ const handleScroll = () => {
 
 async function handleDeleteProduct(id: string) {
   try {
-    await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}`)
-    products.value = products.value.filter((product) => product._id !== id)
-    console.log(`Product with ID ${id} deleted successfully from Elasticsearch.`)
+    await axios.delete(`http://127.0.0.1:9200/products/_doc/${id}?refresh=wait_for`);
+    console.log(`Product with ID ${id} deleted successfully from Elasticsearch.`);
+    // Reset pagination variables and clear the current product list
+    nextPage.value = 1;
+    products.value = [];
+    hasMore.value = true;
+    fetchProductsPagination(true);
   } catch (error) {
     if (error instanceof Error) {
-      console.error(`Error deleting product with ID ${id}:`, error.message)
+      console.error(`Error deleting product with ID ${id}:`, error.message);
     }
   }
 }
+
 
 onMounted(() => {
   searchQuery.value = initialSearch
@@ -191,8 +197,8 @@ onBeforeUnmount(() => {
   }
 })
 
-watch([searchQuery, fetchProducts], () => {
-  if (fetchProducts) {
+watch([searchQuery, props], () => {
+  if (props) {
     fetchProductsPagination()
   }
 })

@@ -52,7 +52,7 @@
           style="margin-bottom: 10px"
           v-model="priceRange"
           :min="0"
-          :max="500"
+          :max="1000"
           :step="10"
           range
         />
@@ -137,7 +137,7 @@ const selectedCategory = ref([])
 const selectedBrand = ref([])
 const selectedColor = ref([])
 const selectedRating = ref([])
-const priceRange = ref([0, 500])
+const priceRange = ref([0, 1000])
 const inStock = ref(true)
 const notInStock = ref(true)
 
@@ -148,7 +148,7 @@ function resetFilters() {
   selectedBrand.value = []
   selectedColor.value = []
   selectedRating.value = []
-  priceRange.value = [0, 500]
+  priceRange.value = [0, 1000]
   inStock.value = false
   notInStock.value = false
 }

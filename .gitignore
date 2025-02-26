@@ -19,6 +19,7 @@ coverage
 
 backend/db.sqlite3s
 backend/myenv
+backend/venv
 
 # Editor directories and files
 .vscode/*
