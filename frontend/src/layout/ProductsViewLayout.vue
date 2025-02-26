@@ -66,7 +66,6 @@ const fetchProductsPagination = async (isNewSearch = false) => {
   }
 
   const mustQueries: Record<string, unknown>[] = []
-
   if (searchQuery.value) {
     mustQueries.push({ match: { name: searchQuery.value } })
   }
@@ -197,7 +196,11 @@ onBeforeUnmount(() => {
   }
 })
 
-watch([searchQuery, props], () => {
+watch(searchQuery, () => {
+  fetchProductsPagination(true)
+})
+
+watch(props, () => {
   if (props) {
     fetchProductsPagination()
   }
