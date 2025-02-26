@@ -8,19 +8,6 @@ const fetchProducts = ref(false)
 
 const editProduct = ref(<Record<string, any> | undefined | null>undefined)
 
-const dummyEditProduct = {
-  id: 1,
-  name: "Sample Product",
-  price: 99.99,
-  stock: 100,
-  description: "A dummy description for the sample product.",
-  category: "Electronics",
-  brand: "Sample Brand",
-  color: "Blue",
-  rating: 4.5,
-  is_available: true
-};
-
 function handleFetchProducts(fetchProductsBool: boolean) {
   console.log('app level: ', fetchProductsBool)
   fetchProducts.value = !fetchProductsBool
@@ -43,7 +30,7 @@ function handleEditProduct(closeOverlay: boolean, product: any) {
   <div>
     <div id="create-product-overlay" v-if="createProductOverlay">
       <CreateProductCard
-        :edit-product="dummyEditProduct"
+        :edit-product="editProduct"
         @handle-close-create-product-overlay="handleCloseCreateProductOverlay"
         @handle-fetch-products="handleFetchProducts"
       />
@@ -54,7 +41,7 @@ function handleEditProduct(closeOverlay: boolean, product: any) {
         @handle-edit-product="handleEditProduct"
         @handle-close-create-product-overlay="handleCloseCreateProductOverlay"
       />
-    </div> 
+    </div>
   </div>
 </template>
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import Card from 'primevue/card'
+import { defineProps, defineEmits } from 'vue'
 
 interface ProductType {
   id: string

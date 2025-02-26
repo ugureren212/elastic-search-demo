@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import ProductItem from '../components/ProductItem.vue'
+import { defineEmits, defineProps, ref } from 'vue'
+import ProductItem from './ProductItem.vue'
 
 interface Product {
   id: string

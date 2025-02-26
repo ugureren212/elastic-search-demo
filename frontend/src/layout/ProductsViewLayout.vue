@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, watch } from 'vue';
-import FilteringSideBar from '../components/FilteringSideBar.vue';
-import ProductCatalog from '../components/ProductCatalog.vue';
-import InputText from 'primevue/inputtext';
-import axios from 'axios';
-import Button from 'primevue/button';
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import FilteringSideBar from '../components/FilteringSideBar.vue'
+import ProductCatalog from '../components/ProductCatalog.vue'
+import InputText from 'primevue/inputtext'
+import axios from 'axios'
+import Button from 'primevue/button'
 
 interface Product {
   id: string
